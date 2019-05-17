@@ -97,6 +97,65 @@ class SuperAdminController {
       return response.internalError(res, { errors });
     }
   }
+
+  /**
+   * Method to update an existing Account Type given the accountName, interestRate, & minimumBalance
+   * @param {object} req Request object containing the staff data
+   * @param {object} res Response object
+   * @return {object} JSON response
+   */
+  static async updateAccountType(req, res) {
+    const { accountName: name, interestRate, minimumBalance } = req.body;
+    const { accountTypeId } = req.params;
+
+    try {
+      const accountType = await AccountType.findOne({
+        where: {
+          [Op.or]: [
+            {
+              id: accountTypeId.trim(),
+            },
+          ],
+        },
+      });
+
+      if (!accountType) {
+        return response.notFound(res, {
+          message: 'This Account Type was not found',
+        });
+      }
+
+      const isAccountNameTaken = name
+        && (await AccountType.findOne({
+          where: {
+            [Op.or]: [
+              {
+                name: name.trim(),
+              },
+            ],
+          },
+        }));
+
+      if (isAccountNameTaken && isAccountNameTaken.id !== parseInt(accountTypeId, 10)) {
+        return response.alreadyExists(res, {
+          message:
+            'This Account Type Name has already been used, please choose another account name',
+        });
+      }
+      console.log(Math.abs(minimumBalance));
+      const updatedAccountType = await accountType.update({
+        name: (name && name.trim()) || accountType.name,
+        interestRate: Math.abs(interestRate).toString() || accountType.interestRate,
+        minimumBalance: Math.abs(minimumBalance).toString() || accountType.minimumBalance,
+      });
+
+      const message = 'AccountType updated successfully';
+
+      return response.success(res, { message, updatedAccountType });
+    } catch (errors) {
+      return response.internalError(res, { errors });
+    }
+  }
 }
 
 export default SuperAdminController;
