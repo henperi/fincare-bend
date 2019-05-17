@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "babel-node server/db/seeders/index.js",
     "seedAdmin": "babel-node server/db/seeders/seedSuperAdmin.js",
+    "migrate": "sequelize db:migrate",
+    "migrate:undo": "sequelize db:migrate:undo:all",
+    "migrate:stepBack": "sequelize db:migrate:undo",
     "start": "nodemon --watch server  --watch .env --watch package.json --watch .eslintrc server/index.js --exec babel-node --presets es2015,stage-2"
   },
   "repository": {
