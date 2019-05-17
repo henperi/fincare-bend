@@ -101,6 +101,85 @@ const validationMiddleware = {
     }
     return next();
   },
+
+  validateCreateLoanType: (req, res, next) => {
+    req
+      .check('loanName')
+      .notEmpty()
+      .withMessage('loanName is required');
+
+    req
+      .check('interestRate')
+      .notEmpty()
+      .withMessage('interestRate is required')
+      .isInt({ min: 0, max: 100, allow_leading_zeroes: false })
+      .withMessage('interestRate must be a valid number between 0 and 100');
+
+    req
+      .check('maximumAmount')
+      .notEmpty()
+      .withMessage('maximumAmount is required')
+      .isInt({ min: 0, allow_leading_zeroes: false })
+      .withMessage('maximumAmount must be a valid number');
+
+    req
+      .check('payCycle')
+      .notEmpty()
+      .withMessage('payCycle is required');
+
+    const errors = req.validationErrors();
+    if (errors) {
+      return response.badRequest(res, { errors });
+    }
+    return next();
+  },
+  validateUpdateLoanType: (req, res, next) => {
+    const {
+      loanName, interestRate, maximumAmount, payCycle,
+    } = req.body;
+    if (loanName) {
+      req
+        .check('loanName')
+        .notEmpty()
+        .withMessage('loanName is required');
+    }
+    if (interestRate) {
+      req
+        .check('interestRate')
+        .notEmpty()
+        .withMessage('interestRate is required')
+        .isInt({ min: 0, max: 100, allow_leading_zeroes: false })
+        .withMessage('interestRate must be a valid number between 0 and 100');
+    }
+    if (maximumAmount) {
+      req
+        .check('maximumAmount')
+        .notEmpty()
+        .withMessage('maximumAmount is required')
+        .isInt({ min: 0, allow_leading_zeroes: false })
+        .withMessage('maximumAmount must be a valid number');
+    }
+    if (payCycle) {
+      req
+        .check('payCycle')
+        .notEmpty()
+        .withMessage('payCycle is required');
+    }
+
+    const errors = req.validationErrors();
+    if (errors) {
+      return response.badRequest(res, { errors });
+    }
+    if (!loanName && !interestRate && !maximumAmount && !payCycle) {
+      return response.badRequest(res, {
+        errors: {
+          message: 'Please supply one or more fields to update',
+          fields: ['loanName', 'interestRate', 'maximumAmount', 'payCycle'],
+        },
+      });
+    }
+    return next();
+  },
 };
 
 export default validationMiddleware;

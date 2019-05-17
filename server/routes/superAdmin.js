@@ -5,12 +5,20 @@ import checkAuth from '../middlewares/checkAuth';
 import checkAccessLevel from '../middlewares/checkAccessLevel';
 
 const superAdminRouter = express.Router();
-const { createStaff, createAccountType, updateAccountType } = SuperAdminController;
+const {
+  createStaff,
+  createAccountType,
+  updateAccountType,
+  createLoanType,
+  updateLoanType,
+} = SuperAdminController;
 
 const {
   validateCreateStaff,
   validateCreateAccountType,
   validateUpdateAccountType,
+  validateCreateLoanType,
+  validateUpdateLoanType,
 } = validationMiddleware;
 
 const { isSupperAdmin } = checkAccessLevel;
@@ -31,6 +39,28 @@ superAdminRouter.put(
   isSupperAdmin,
   validateUpdateAccountType,
   updateAccountType,
+);
+
+/**
+ * Create Loan Type
+ */
+superAdminRouter.post(
+  '/loanType/create',
+  checkAuth,
+  isSupperAdmin,
+  validateCreateLoanType,
+  createLoanType,
+);
+
+/**
+ * Update Loan Type
+ */
+superAdminRouter.put(
+  '/loanType/update/:loanTypeId',
+  checkAuth,
+  isSupperAdmin,
+  validateUpdateLoanType,
+  updateLoanType,
 );
 
 export default superAdminRouter;
