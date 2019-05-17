@@ -1,5 +1,5 @@
 const formatErrors = () => ({
-  errorFormatter: (param, msg, value) => {
+  errorFormatter: (param, message, value) => {
     const namespace = param.split('.');
     const root = namespace.shift();
     let formParam = root;
@@ -9,9 +9,12 @@ const formatErrors = () => ({
     }
     return {
       param: formParam,
-      msg,
+      message,
       value,
     };
+  },
+  customValidators: {
+    enum: (input, options) => options.includes(input),
   },
 });
 
