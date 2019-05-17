@@ -4,6 +4,7 @@ export default (sequelize, DataTypes) => {
     {
       staffId: { type: DataTypes.STRING, unique: true, allowNull: false },
       fullname: { type: DataTypes.STRING, unique: true, allowNull: false },
+      phone: { type: DataTypes.STRING, unique: true, allowNull: false },
     },
     {},
   );

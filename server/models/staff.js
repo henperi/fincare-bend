@@ -5,7 +5,6 @@ export default (sequelize, DataTypes) => {
       uniqueId: { type: DataTypes.STRING, unique: true, allowNull: false },
       email: { type: DataTypes.STRING, unique: true, allowNull: false },
       password: { type: DataTypes.STRING, allowNull: false },
-      phone: { type: DataTypes.STRING, unique: true, allowNull: false },
       level: { type: DataTypes.STRING, allowNull: false },
     },
     {},
