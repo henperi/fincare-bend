@@ -66,8 +66,8 @@ const response = {
   internalError: (res, data, code = 500) => {
     console.log(data);
     res.status(code).json({
-      data,
       success: false,
+      data,
     });
   },
 };
