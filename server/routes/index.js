@@ -1,10 +1,12 @@
 import express from 'express';
-import authRouter from './staff';
+import authRouter from './auth';
+import staffRouter from './staff';
 import superAdminRouter from './superAdmin';
 
 const router = express.Router();
 
 router.use('/super-admin', superAdminRouter);
 router.use('/auth', authRouter);
+router.use('/staff', staffRouter);
 
 export default router;

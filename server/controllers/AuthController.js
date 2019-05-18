@@ -4,8 +4,6 @@ import model from '../models';
 import response from '../helpers/responses';
 import { comparePassword } from '../helpers/passwordHelpers';
 import generateAuthToken from '../helpers/generateAuthToken';
-// import { hashPassword } from '../helpers/passwordHelpers';
-// import generateStaffId from '../helpers/generateStaffId';
 
 const { Staff, StaffProfile } = model;
 const { Op } = Sequelize;

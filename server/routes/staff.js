@@ -1,10 +1,18 @@
 import express from 'express';
 
-import AuthController from '../controllers/AuthController';
-import validateAuthActions from '../middlewares/validation/authActions';
+import checkAccessLevel from '../middlewares/checkAccessLevel';
+import checkAuth from '../middlewares/checkAuth';
+import StaffController from '../controllers/StaffController';
+import validateStaffActions from '../middlewares/validation/staffActions';
 
-const authRouter = express.Router();
+const staffRouter = express.Router();
 
-authRouter.post('/', validateAuthActions.validateStaffAuth, AuthController.authenticateStaff);
+staffRouter.post(
+  '/customer/create',
+  checkAuth,
+  checkAccessLevel.isStaff,
+  validateStaffActions.validateCreateCustomer,
+  StaffController.createCustomer,
+);
 
-export default authRouter;
+export default staffRouter;

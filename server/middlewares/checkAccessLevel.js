@@ -2,7 +2,7 @@ import response from '../helpers/responses';
 
 const checkAccessLevel = {
   isSupperAdmin: (req, res, next) => {
-    const { level } = req.app.locals.user;
+    const { level } = res.locals.user;
 
     if (level !== 'SuperAdmin') {
       return response.unAuthorized(res, {
@@ -11,6 +11,20 @@ const checkAccessLevel = {
         },
       });
     }
+    return next();
+  },
+
+  isStaff: (req, res, next) => {
+    const { user } = res.locals;
+
+    if (!['SuperAdmin', 'Admin', 'Officer'].includes(user.level)) {
+      return response.unAuthorized(res, {
+        errors: {
+          message: "You're not authorised to access this resource",
+        },
+      });
+    }
+
     return next();
   },
 };
