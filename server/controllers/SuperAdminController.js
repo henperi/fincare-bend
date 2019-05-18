@@ -61,6 +61,85 @@ class SuperAdminController {
   }
 
   /**
+   * Method to update an existing Staff given the staffId
+   * editable fields consists of either of the following
+   * [email, phone, password, firstName, lastName, staffLevel]
+   * @param {object} req Request object containing the staff data
+   * @param {object} res Response object
+   * @return {object} JSON response
+   */
+  static async updateStaff(req, res) {
+    const {
+      email, phone, fullName, staffLevel,
+    } = req.body;
+    const { staffId: uniqueId } = req.params;
+
+    try {
+      const staff = await Staff.findOne({
+        where: {
+          [Op.or]: [
+            {
+              uniqueId,
+            },
+          ],
+          level: {
+            [Op.ne]: 'SuperAdmin',
+          },
+        },
+        include: { model: StaffProfile, as: 'Profile' },
+      });
+
+      if (!staff) {
+        return response.notFound(res, {
+          message: "The staff you're trying to update was not found, please check and try again",
+        });
+      }
+
+      const isStaffNameTaken = fullName
+        && (await StaffProfile.findOne({
+          where: {
+            fullname: fullName.trim(),
+          },
+        }));
+
+      if (isStaffNameTaken && isStaffNameTaken.staffId !== parseInt(staff.id, 10)) {
+        return response.alreadyExists(res, {
+          message:
+            'There is already another staff with this exact name, please make a few changes to avoid conflicts in the feature',
+        });
+      }
+
+      const updatedStaff = await staff.update({
+        email: (email && email.trim()) || staff.email,
+        level: (staffLevel && staffLevel.trim()) || staff.level,
+      });
+      updatedStaff.dataValues.password = undefined;
+
+      const setableParams = {};
+      if (fullName) {
+        setableParams.fullname = fullName.trim();
+      }
+      if (phone) {
+        setableParams.phone = phone;
+      }
+      if (Object.keys(setableParams).length > 0) {
+        const updatedProfile = await StaffProfile.update(
+          { ...setableParams },
+          { where: { staffId: staff.id }, returning: true },
+        );
+
+        updatedStaff.dataValues.Profile = updatedProfile[1]['0'];
+      }
+
+      const message = 'Staff updated successfully';
+
+      return response.success(res, { message, updatedStaff });
+    } catch (errors) {
+      return response.internalError(res, { errors });
+    }
+  }
+
+  /**
    * Method to create a new Account Type given the accountName, interestRate, & minimumBalance
    * @param {object} req Request object containing the staff data
    * @param {object} res Response object

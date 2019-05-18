@@ -35,6 +35,47 @@ const validationMiddleware = {
     return next();
   },
 
+  validateUpdateStaff: (req, res, next) => {
+    const {
+      email, phone, fullName, staffLevel,
+    } = req.body;
+
+    if (email) {
+      req.checkBody('email', 'Email is not valid').isEmail();
+    }
+    if (phone) {
+      req
+        .checkBody('phone')
+        .isLength({ min: 11, max: 11 })
+        .withMessage('Phone number must be an 11 digit nigerian number');
+    }
+    if (fullName) {
+      req
+        .check('fullName')
+        .isLength({ min: 3 })
+        .withMessage('fullName must be 3 characters or mores')
+        .isLength({ max: 50 })
+        .withMessage('fullName must not be greater than 50 characters');
+    }
+    if (staffLevel) {
+      req.checkBody('staffLevel', 'staffLevel must be Admin or Officer').enum(['Admin', 'Officer']);
+    }
+
+    const errors = req.validationErrors();
+    if (errors) {
+      return response.badRequest(res, { errors });
+    }
+    if (!email && !phone && !fullName && !staffLevel) {
+      return response.badRequest(res, {
+        errors: {
+          message: 'Please supply one or more fields to update',
+          fields: ['email', 'phone', 'fullName', 'staffLevel'],
+        },
+      });
+    }
+    return next();
+  },
+
   validateCreateAccountType: (req, res, next) => {
     req
       .check('accountName')
