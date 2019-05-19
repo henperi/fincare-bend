@@ -15,4 +15,20 @@ staffRouter.post(
   StaffController.createCustomer,
 );
 
+staffRouter.post(
+  '/customer/createProfile/:customerId',
+  checkAuth,
+  checkAccessLevel.isStaff,
+  validateStaffActions.validateCreateCustomerProfile,
+  StaffController.createCustomerProfile,
+);
+
+staffRouter.post(
+  '/customer/createAddress/:customerId',
+  checkAuth,
+  checkAccessLevel.isStaff,
+  validateStaffActions.validateCreateCustomerAddress,
+  StaffController.createCustomerAddress,
+);
+
 export default staffRouter;

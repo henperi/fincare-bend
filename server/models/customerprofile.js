@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
   );
   CustomerProfile.associate = (models) => {
     // associations can be defined here
+    CustomerProfile.belongsTo(models.Customer, {
+      foreignKey: 'customerId',
+      onDelete: 'CASCADE',
+    });
   };
   return CustomerProfile;
 };

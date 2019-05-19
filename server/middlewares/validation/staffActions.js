@@ -50,6 +50,39 @@ const validateStaffActions = {
 
     return next();
   },
+  validateCreateCustomerProfile: (req, res, next) => {
+    req.checkBody('gender', 'gender is required').notEmpty();
+    req.checkBody('dateOfBirth', 'dateOfBirth is required').notEmpty();
+    req.checkBody('placeOfBirth', 'placeOfBirth is required').notEmpty();
+    req.checkBody('maritalStatus', 'maritalStatus is required').notEmpty();
+    req.checkBody('nationality', 'nationality is required').notEmpty();
+    req.checkBody('stateOfOrigin', 'stateOfOrigin is required').notEmpty();
+    req.checkBody('LGA', 'LGA is required').notEmpty();
+    req.checkBody('homeTown', 'homeTown is required').notEmpty();
+    req.checkBody('profession', 'profession is required').notEmpty();
+
+    const errors = req.validationErrors();
+    if (errors) {
+      return response.badRequest(res, { errors });
+    }
+
+    return next();
+  },
+  validateCreateCustomerAddress: (req, res, next) => {
+    req.checkBody('city', 'city is required').notEmpty();
+    req.checkBody('state', 'state is required').notEmpty();
+    req.checkBody('addressLine1', 'addressLine1 is required').notEmpty();
+    if (req.body.addressLine2) {
+      req.checkBody('addressLine2', 'addressLine2 is required').notEmpty();
+    }
+
+    const errors = req.validationErrors();
+    if (errors) {
+      return response.badRequest(res, { errors });
+    }
+
+    return next();
+  },
 };
 
 export default validateStaffActions;
