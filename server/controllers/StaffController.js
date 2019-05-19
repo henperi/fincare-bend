@@ -229,6 +229,31 @@ class StaffController {
       return response.internalError(res, { error });
     }
   }
+
+  /**
+   * Method to fetch all customer
+   * @param {object} req with
+   * @param {object} res Response to request
+   * @return {object} JSON response
+   */
+  static async fetchAllCustomers(req, res) {
+    try {
+      const customers = await Customer.findAll({
+        where: {},
+        include: [
+          { model: Address, as: 'Address' },
+          { model: CustomerProfile, as: 'Profile' },
+          { model: NextOfKin, as: 'NextOfKin' },
+        ],
+      });
+
+      const message = 'Array of 0 or more customers fetched successfully';
+
+      return response.created(res, { message, customers });
+    } catch (error) {
+      return response.internalError(res, { error });
+    }
+  }
 }
 
 export default StaffController;
