@@ -39,4 +39,11 @@ staffRouter.post(
   StaffController.createCustomerNextOfKin,
 );
 
+staffRouter.get(
+  '/customer/fetch-all',
+  checkAuth,
+  checkAccessLevel.isStaff,
+  StaffController.fetchAllCustomers,
+);
+
 export default staffRouter;
