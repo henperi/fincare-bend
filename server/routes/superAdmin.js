@@ -36,7 +36,7 @@ superAdminRouter.put(
 );
 
 superAdminRouter.post(
-  '/accountType/create',
+  '/account-type/create',
   checkAuth,
   isSupperAdmin,
   validateCreateAccountType,
@@ -44,7 +44,7 @@ superAdminRouter.post(
 );
 
 superAdminRouter.put(
-  '/accountType/update/:accountTypeId',
+  '/account-type/update/:accountTypeId',
   checkAuth,
   isSupperAdmin,
   validateUpdateAccountType,
@@ -55,7 +55,7 @@ superAdminRouter.put(
  * Create Loan Type
  */
 superAdminRouter.post(
-  '/loanType/create',
+  '/loan-type/create',
   checkAuth,
   isSupperAdmin,
   validateCreateLoanType,
@@ -66,7 +66,7 @@ superAdminRouter.post(
  * Update Loan Type
  */
 superAdminRouter.put(
-  '/loanType/update/:loanTypeId',
+  '/loan-type/update/:loanTypeId',
   checkAuth,
   isSupperAdmin,
   validateUpdateLoanType,

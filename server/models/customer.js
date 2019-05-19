@@ -21,6 +21,10 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'customerId',
       as: 'Address',
     });
+    Customer.hasOne(models.NextOfKin, {
+      foreignKey: 'customerId',
+      as: 'NextOfKin',
+    });
   };
   return Customer;
 };

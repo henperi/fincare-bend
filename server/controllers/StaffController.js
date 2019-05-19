@@ -3,7 +3,9 @@ import Sequelize from 'sequelize';
 import model from '../models';
 import response from '../helpers/responses';
 
-const { CustomerProfile, Customer, Address } = model;
+const {
+  CustomerProfile, Customer, Address, NextOfKin,
+} = model;
 const { Op } = Sequelize;
 /**
  * Controller to handle neccessary staffActions
@@ -49,8 +51,15 @@ class StaffController {
           accountOfficerId: id,
           Profile: {},
           Address: {},
+          NextOfKin: {},
         },
-        { include: [{ model: Address, as: 'Address' }, { model: CustomerProfile, as: 'Profile' }] },
+        {
+          include: [
+            { model: Address, as: 'Address' },
+            { model: CustomerProfile, as: 'Profile' },
+            { model: NextOfKin, as: 'NextOfKin' },
+          ],
+        },
       );
 
       const message = 'new customer created successfully';
@@ -153,6 +162,69 @@ class StaffController {
       const message = 'Customer address has been added successfully';
 
       return response.created(res, { message, createdAddress });
+    } catch (error) {
+      return response.internalError(res, { error });
+    }
+  }
+
+  /**
+   * Method to create a customer profile
+   * @param {object} req with customer profile data
+   * @param {object} res Response to request
+   * @return {object} JSON response
+   */
+  static async createCustomerNextOfKin(req, res) {
+    const {
+      title,
+      firstName,
+      lastName,
+      gender,
+      relationship,
+      nationality,
+      stateOfOrigin,
+      LGA,
+      phoneNumber,
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+    } = req.body;
+
+    const { customerId } = req.params;
+
+    try {
+      const customer = await Customer.findOne({
+        where: {
+          [Op.or]: [{ id: customerId }],
+        },
+        include: { model: NextOfKin, as: 'NextOfKin' },
+      });
+
+      if (!customer) {
+        return response.notFound(res, {
+          message: 'Customer does not exist',
+        });
+      }
+
+      const createdNextOfKin = await customer.NextOfKin.update({
+        title,
+        firstName,
+        lastName,
+        gender,
+        relationship,
+        nationality,
+        stateOfOrigin,
+        LGA,
+        phoneNumber,
+        addressLine1,
+        addressLine2,
+        city,
+        state,
+      });
+
+      const message = 'Customer next of kin has been added successfully';
+
+      return response.created(res, { message, createdNextOfKin });
     } catch (error) {
       return response.internalError(res, { error });
     }

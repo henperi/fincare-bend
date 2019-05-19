@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "babel-node server/db/seeders/index.js",
-    "seedAdmin": "babel-node server/db/seeders/seedSuperAdmin.js",
+    "seed:admin": "babel-node server/db/seeders/seedSuperAdmin.js",
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo:all",
     "migrate:stepBack": "sequelize db:migrate:undo",
