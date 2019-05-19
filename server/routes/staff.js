@@ -16,7 +16,7 @@ staffRouter.post(
 );
 
 staffRouter.post(
-  '/customer/createProfile/:customerId',
+  '/customer/create-profile/:customerId',
   checkAuth,
   checkAccessLevel.isStaff,
   validateStaffActions.validateCreateCustomerProfile,
@@ -24,11 +24,19 @@ staffRouter.post(
 );
 
 staffRouter.post(
-  '/customer/createAddress/:customerId',
+  '/customer/create-address/:customerId',
   checkAuth,
   checkAccessLevel.isStaff,
   validateStaffActions.validateCreateCustomerAddress,
   StaffController.createCustomerAddress,
+);
+
+staffRouter.post(
+  '/customer/create-next-of-kin/:customerId',
+  checkAuth,
+  checkAccessLevel.isStaff,
+  validateStaffActions.validateCreateCustomerNextOfKin,
+  StaffController.createCustomerNextOfKin,
 );
 
 export default staffRouter;

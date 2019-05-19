@@ -83,6 +83,30 @@ const validateStaffActions = {
 
     return next();
   },
+  validateCreateCustomerNextOfKin: (req, res, next) => {
+    req.checkBody('title', 'title is required').notEmpty();
+    req.checkBody('firstName', 'firstName is required').notEmpty();
+    req.checkBody('lastName', 'placeOfBirth is required').notEmpty();
+    req.checkBody('gender', 'gender is required').notEmpty();
+    req.checkBody('relationship', 'relationship is required').notEmpty();
+    req.checkBody('nationality', 'nationality is required').notEmpty();
+    req.checkBody('stateOfOrigin', 'stateOfOrigin is required').notEmpty();
+    req.checkBody('LGA', 'LGA is required').notEmpty();
+    req.checkBody('phoneNumber', 'phoneNumber is required').notEmpty();
+    req.checkBody('city', 'city is required').notEmpty();
+    req.checkBody('state', 'state is required').notEmpty();
+    req.checkBody('addressLine1', 'addressLine1 is required').notEmpty();
+    if (req.body.addressLine2) {
+      req.checkBody('addressLine2', 'addressLine2 is required').notEmpty();
+    }
+
+    const errors = req.validationErrors();
+    if (errors) {
+      return response.badRequest(res, { errors });
+    }
+
+    return next();
+  },
 };
 
 export default validateStaffActions;
