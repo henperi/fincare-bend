@@ -15,6 +15,10 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'staffId',
       as: 'Profile',
     });
+    Staff.hasMany(models.Customer, {
+      foreignKey: 'accountOfficerId',
+      as: 'Customers',
+    });
   };
   return Staff;
 };

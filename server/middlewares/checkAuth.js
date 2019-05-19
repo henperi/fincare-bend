@@ -35,7 +35,7 @@ const checkAuth = async (req, res, next) => {
       });
     }
 
-    req.app.locals.user = {
+    res.locals.user = {
       email,
       uniqueId,
       id,
