@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 import response from '../helpers/responses';
+import checkRequestBodyKeys from '../middlewares/validation/checkRequestBodyKeys';
 
 const {
   CustomerProfile, Customer, Address, NextOfKin,
@@ -253,6 +254,105 @@ class StaffController {
     } catch (error) {
       return response.internalError(res, { error });
     }
+  }
+
+  /**
+   * @description Method to update an existing Customer given the customerId
+   * editable fields consists of either of the following
+   * [firstName, lastName, otherNames, phone, profileObject, addressObject]
+   *
+   * @param {object} req Request object containing the staff data
+   * @param {object} res Response object
+   * @return {object} JSON response
+   */
+  static async updateCustomer(req, res) {
+    const {
+      firstName, lastName, otherNames, phone, profileObject, addressObject,
+    } = req.body;
+    const { customerId } = req.params;
+
+    try {
+      const customer = await Customer.findOne({
+        where: {
+          [Op.or]: [{ id: customerId }],
+        },
+        include: [{ model: CustomerProfile, as: 'Profile' }, { model: Address, as: 'Address' }],
+      });
+
+      if (!customer) {
+        return response.notFound(res, {
+          message: "The customer you're trying to update was not found, please check and try again",
+        });
+      }
+      const updateableParams = {};
+      if (firstName) {
+        updateableParams.firstName = firstName.trim();
+      }
+      if (lastName) {
+        updateableParams.lastName = lastName.trim();
+      }
+      if (otherNames) {
+        updateableParams.otherNames = otherNames.trim();
+      }
+      if (phone) {
+        updateableParams.phone = phone.trim();
+      }
+
+      const updatedCustomer = await customer.update({ ...updateableParams }, { returning: true });
+
+      if (profileObject && Object.keys(profileObject).length > 0) {
+        console.log('profileObject', profileObject);
+        const updatedCustomerProfile = await customer.Profile.update(
+          { ...profileObject },
+          {
+            fields: [
+              'gender',
+              'dateOfBirth',
+              'placeOfBirth',
+              'maritalStatus',
+              'nationality',
+              'stateOfOrigin',
+              'LGA',
+              'homeTown',
+              'profession',
+            ],
+            returning: true,
+          },
+        );
+
+        updatedCustomer.dataValues.Profile = updatedCustomerProfile;
+      }
+
+      if (addressObject && Object.keys(addressObject).length > 0) {
+        console.log('addressObject', addressObject);
+        const updatedCustomerAddress = await customer.Address.update(
+          { ...addressObject },
+          { fields: ['city', 'state', 'addressLine1', 'addressLine2'], returning: true },
+        );
+
+        updatedCustomer.dataValues.Address = updatedCustomerAddress;
+      }
+
+      const message = 'Customer updated successfully';
+
+      return response.success(res, { message, updatedCustomer });
+    } catch (errors) {
+      return response.internalError(res, { errors });
+    }
+  }
+
+  /**
+   * @description Method to update an existing Customer given the customerId
+   * editable fields consists of either of the following
+   * [firstName, lastName, otherNames, phone, profileObject, addressObject]
+   *
+   * @param {object} req Request object containing the staff data
+   * @param {object} res Response object
+   * @return {object} JSON response
+   */
+  static async testReq(req, res) {
+    const passedParams = Object.keys(req.body);
+    checkRequestBodyKeys(passedParams, req, res);
   }
 }
 

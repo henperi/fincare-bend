@@ -1,3 +1,5 @@
+import naijaMobile from 'naija-phone-number';
+
 const formatErrors = () => ({
   errorFormatter: (param, message, value) => {
     const namespace = param.split('.');
@@ -15,6 +17,7 @@ const formatErrors = () => ({
   },
   customValidators: {
     enum: (input, options) => options.includes(input),
+    isNigerianMobile: mobile => naijaMobile.isValid(mobile),
   },
 });
 

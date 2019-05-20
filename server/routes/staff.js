@@ -46,4 +46,14 @@ staffRouter.get(
   StaffController.fetchAllCustomers,
 );
 
+staffRouter.put(
+  '/customer/update/:customerId',
+  checkAuth,
+  checkAccessLevel.isStaff,
+  validateStaffActions.validateUpdateCustomer,
+  StaffController.updateCustomer,
+);
+
+// staffRouter.post('/customer/testReq', checkAuth, checkAccessLevel.isStaff, StaffController.testReq);
+
 export default staffRouter;
