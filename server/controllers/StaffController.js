@@ -2,7 +2,6 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 import response from '../helpers/responses';
-import checkRequestBodyKeys from '../middlewares/validation/checkRequestBodyKeys';
 
 const {
   CustomerProfile, Customer, Address, NextOfKin,
@@ -301,7 +300,6 @@ class StaffController {
       const updatedCustomer = await customer.update({ ...updateableParams }, { returning: true });
 
       if (profileObject && Object.keys(profileObject).length > 0) {
-        console.log('profileObject', profileObject);
         const updatedCustomerProfile = await customer.Profile.update(
           { ...profileObject },
           {
@@ -324,7 +322,6 @@ class StaffController {
       }
 
       if (addressObject && Object.keys(addressObject).length > 0) {
-        console.log('addressObject', addressObject);
         const updatedCustomerAddress = await customer.Address.update(
           { ...addressObject },
           { fields: ['city', 'state', 'addressLine1', 'addressLine2'], returning: true },
@@ -339,20 +336,6 @@ class StaffController {
     } catch (errors) {
       return response.internalError(res, { errors });
     }
-  }
-
-  /**
-   * @description Method to update an existing Customer given the customerId
-   * editable fields consists of either of the following
-   * [firstName, lastName, otherNames, phone, profileObject, addressObject]
-   *
-   * @param {object} req Request object containing the staff data
-   * @param {object} res Response object
-   * @return {object} JSON response
-   */
-  static async testReq(req, res) {
-    const passedParams = Object.keys(req.body);
-    checkRequestBodyKeys(passedParams, req, res);
   }
 }
 
