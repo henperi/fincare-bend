@@ -15,7 +15,7 @@ const generateAuthToken = ({
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: 86400,
+        expiresIn: '5d',
       },
     );
   } catch (error) {
