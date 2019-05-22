@@ -8,9 +8,13 @@
     "seed": "babel-node server/db/seeders/index.js",
     "seed:admin": "babel-node server/db/seeders/seedSuperAdmin.js",
     "migrate": "sequelize db:migrate",
-    "migrate:undo": "sequelize db:migrate:undo:all",
+    "migrate:drop": "sequelize db:migrate:undo:all",
+    "migrate:reset": "sequelize db:migrate:undo:all && npm run migrate",
     "migrate:stepBack": "sequelize db:migrate:undo",
-    "start": "nodemon --watch server  --watch .env --watch package.json --watch .eslintrc server/index.js --exec babel-node --presets es2015,stage-2"
+    "start:dev": "npm run migrate && nodemon --watch server --watch .env --watch package.json --watch .eslintrc server/index.js --exec babel-node --presets es2015,stage-2",
+    "restart": "npm run build && npm run migrate:reset && node build/index.js",
+    "start": "npm run build && npm run migrate && node build/index.js",
+    "build": "babel ./server -d build/"
   },
   "repository": {
     "type": "git",
@@ -52,6 +56,7 @@
     "morgan": "^1.9.1",
     "naija-phone-number": "^1.0.2",
     "pg": "^7.11.0",
-    "sequelize": "^5.8.6"
+    "sequelize": "^5.8.6",
+    "sequelize-cli": "^5.4.0"
   }
 }

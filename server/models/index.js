@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
-import dbConfig from '../db/config/config.json';
+import dbConfig from '../db/config/config';
 
 dotenv.config();
 
