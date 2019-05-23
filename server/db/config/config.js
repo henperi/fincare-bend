@@ -2,10 +2,13 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const logQueries = process.env.NODE_ENV === 'production' && { logging: false };
+
 module.exports = {
   development: {
     use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
+    ...logQueries,
   },
   test: {
     username: 'fincare_admin',
@@ -13,10 +16,12 @@ module.exports = {
     database: 'fincare_test',
     host: '127.0.0.1',
     dialect: 'postgres',
+    ...logQueries,
   },
   production: {
     use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
+    ...logQueries,
   },
   local: {
     username: process.env.DB_USERNAME,
@@ -24,5 +29,6 @@ module.exports = {
     database: process.env.DB_NAME,
     host: process.env.DB_HOSTNAME,
     dialect: 'postgres',
+    ...logQueries,
   },
 };
