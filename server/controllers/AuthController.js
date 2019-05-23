@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 import response from '../helpers/responses';
-import { comparePassword } from '../helpers/passwordHelpers';
+import { comparePassword, hashPassword } from '../helpers/passwordHelpers';
 import generateAuthToken from '../helpers/generateAuthToken';
 
 const { Staff, StaffProfile } = model;
@@ -12,8 +12,8 @@ const { Op } = Sequelize;
  */
 class AuthController {
   /**
-   * Method to authenticate a lab
-   * @param {object} req Signup request
+   * Method to authenticate a staff
+   * @param {object} req Request object
    * @param {object} res Response to request
    * @return {object} JSON response
    */
@@ -30,7 +30,7 @@ class AuthController {
 
       if (!staff) {
         return response.notFound(res, {
-          errors: { message: 'Invalid login credentials, have you forgotten your login details?' },
+          errors: [{ message: 'Invalid login credentials, have you forgotten your login details' }],
         });
       }
 
@@ -38,7 +38,7 @@ class AuthController {
 
       if (!isPasswordValid) {
         return response.badRequest(res, {
-          errors: { message: 'Invalid login credentials, have you forgotten your login details' },
+          errors: [{ message: 'Invalid login credentials, have you forgotten your login details' }],
         });
       }
 
@@ -46,6 +46,56 @@ class AuthController {
       const message = 'Authentication successful';
 
       return response.success(res, { message, token });
+    } catch (error) {
+      return response.internalError(res, { error });
+    }
+  }
+
+  /**
+   * Method to update a staffs password
+   * @param {object} req  Request object
+   * @param {object} res Response to request
+   * @return {object} JSON response
+   */
+  static async updatePassword(req, res) {
+    const { oldPassword, newPassword } = req.body;
+    const { id } = res.locals.user;
+
+    try {
+      const staff = await Staff.findOne({
+        where: {
+          [Op.or]: [{ id }],
+        },
+      });
+
+      if (!staff) {
+        return response.notFound(res, {
+          errors: [
+            {
+              message:
+                'Unable to update your password, are you logged in? Please logout then login and try again',
+            },
+          ],
+        });
+      }
+
+      const isPasswordValid = comparePassword(oldPassword, staff.password);
+
+      if (!isPasswordValid) {
+        return response.badRequest(res, {
+          errors: [
+            { message: 'Your old password is wrong, do you have issues remembering your password' },
+          ],
+        });
+      }
+
+      const hashedPassword = hashPassword(newPassword.trim());
+      await staff.update({
+        password: hashedPassword || staff.password,
+      });
+      const message = 'Your password has been updated successfully';
+
+      return response.success(res, { message });
     } catch (error) {
       return response.internalError(res, { error });
     }

@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-// import Sequelize from 'sequelize';
 import response from '../helpers/responses';
 
 import model from '../models';
@@ -13,9 +12,11 @@ const checkAuth = async (req, res, next) => {
 
   if (!token) {
     return response.badRequest(res, {
-      errors: {
-        message: 'Access token not found, kindly login and try again',
-      },
+      errors: [
+        {
+          message: 'Authentication issues, kindly login and try again',
+        },
+      ],
     });
   }
 
@@ -29,9 +30,11 @@ const checkAuth = async (req, res, next) => {
 
     if (!staff) {
       return response.notFound(res, {
-        errors: {
-          message: 'Opps, your account appears to be missing',
-        },
+        errors: [
+          {
+            message: 'Opps... Account issues, are you logged in? please loggout and login again',
+          },
+        ],
       });
     }
 
@@ -44,9 +47,11 @@ const checkAuth = async (req, res, next) => {
     return next();
   } catch (errors) {
     return response.unAuthorized(res, {
-      errors: {
-        message: 'Token provided is not valid, try again',
-      },
+      errors: [
+        {
+          message: 'Token provided is not valid, try again',
+        },
+      ],
     });
   }
 };
