@@ -9,7 +9,15 @@ export default (sequelize, DataTypes) => {
       },
       actType: DataTypes.STRING,
       contributionFrequency: DataTypes.STRING,
-      contributionAmount: DataTypes.FLOAT,
+      contributionAmount: DataTypes.DECIMAL,
+      ledgerBalance: {
+        type: DataTypes.DECIMAL,
+        defaultValue: 0,
+      },
+      outstandingBalance: {
+        type: DataTypes.DECIMAL,
+        defaultValue: 0,
+      },
       customerId: DataTypes.INTEGER,
       actTypeId: DataTypes.STRING,
     },
