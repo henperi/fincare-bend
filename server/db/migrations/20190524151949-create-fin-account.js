@@ -18,7 +18,13 @@ module.exports = {
       type: Sequelize.STRING,
     },
     contributionAmount: {
-      type: Sequelize.FLOAT,
+      type: Sequelize.DECIMAL,
+    },
+    ledgerBalance: {
+      type: Sequelize.DECIMAL,
+    },
+    outstandingBalance: {
+      type: Sequelize.DECIMAL,
     },
     customerId: {
       type: Sequelize.INTEGER,

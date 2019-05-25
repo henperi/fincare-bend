@@ -13,7 +13,7 @@ module.exports = {
       type: Sequelize.INTEGER,
     },
     minimumBalance: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.DECIMAL,
     },
     createdAt: {
       allowNull: false,

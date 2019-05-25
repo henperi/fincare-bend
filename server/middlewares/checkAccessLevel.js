@@ -20,7 +20,6 @@ const checkAccessLevel = {
         message: "You're not authorised to access this resource",
       });
     }
-
     return next();
   },
 };
