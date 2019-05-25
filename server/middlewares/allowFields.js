@@ -19,19 +19,15 @@ const allowFields = acceptableFields => (req, res, next) => {
 
   if (invalidFields.length > 0) {
     return response.badRequest(res, {
-      errors: {
-        message: 'You have sent invalid fields',
-        invalidFields,
-        acceptableFields,
-      },
+      message: 'You have sent invalid fields',
+      invalidFields,
+      acceptableFields,
     });
   }
   if (sentFields.length === 0) {
     return response.badRequest(res, {
-      errors: {
-        message: 'Please supply one or more acceptable fields',
-        acceptableFields,
-      },
+      message: 'Please supply one or more acceptable fields',
+      acceptableFields,
     });
   }
   res.locals.acceptableFields = acceptableFields;

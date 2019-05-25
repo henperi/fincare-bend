@@ -5,6 +5,8 @@ import checkAuth from '../middlewares/checkAuth';
 import StaffController from '../controllers/StaffController';
 import validateStaffActions from '../middlewares/validation/staffActions';
 import allowFields from '../middlewares/allowFields';
+import FinAccountController from '../controllers/finAccountController';
+import finAccountMethods from '../middlewares/validation/finMethods';
 
 const staffRouter = express.Router();
 

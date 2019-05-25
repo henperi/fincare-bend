@@ -12,11 +12,7 @@ const checkAuth = async (req, res, next) => {
 
   if (!token) {
     return response.badRequest(res, {
-      errors: [
-        {
-          message: 'Authentication issues, kindly login and try again',
-        },
-      ],
+      message: 'Authentication issues, kindly login and try again',
     });
   }
 
@@ -30,11 +26,7 @@ const checkAuth = async (req, res, next) => {
 
     if (!staff) {
       return response.notFound(res, {
-        errors: [
-          {
-            message: 'Opps... Account issues, are you logged in? please loggout and login again',
-          },
-        ],
+        message: 'Opps... Account issues, are you logged in? please loggout and login again',
       });
     }
 
@@ -47,12 +39,9 @@ const checkAuth = async (req, res, next) => {
     return next();
   } catch (errors) {
     return response.unAuthorized(res, {
-      errors: [
-        {
-          message: 'Token provided is not valid, try again',
-        },
-      ],
+      message: 'Token provided is not valid, try again',
     });
   }
 };
+
 export default checkAuth;

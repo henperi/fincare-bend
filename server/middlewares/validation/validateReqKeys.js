@@ -91,13 +91,15 @@ const validateReqKeys = (req, keys, object = null) => {
         return req
           .checkBody(param)
           .isLength({ min: 11, max: 11 })
-          .withMessage('Phone number must be an 11 digit nigerian number');
+          .withMessage('Phone number must be an 11 digit nigerian number')
+          .isNigerianMobile(req.body[param])
+          .withMessage('Phone number must be a valid Nigerian number e.g 08061275564');
 
       case 'phoneNumber':
         return req
           .checkBody(param)
-          .isLength({ min: 11, max: 11 })
-          .withMessage('phoneNumber must be an 11 digit nigerian number');
+          .isNigerianMobile(req.body[param])
+          .withMessage('Phone number must be a valid Nigerian number e.g 08061275564');
 
       case 'title':
         return req
@@ -191,6 +193,23 @@ const validateReqKeys = (req, keys, object = null) => {
           .checkBody(param)
           .isLength({ min: 3, max: 25 })
           .withMessage('relationship is required and must be between 3 and 25 characters');
+
+      case 'actType':
+        return req
+          .checkBody(param)
+          .isLength({ min: 3, max: 25 })
+          .withMessage('actType must be between 3 and 25 characters');
+
+      case 'contributionAmount':
+        return req
+          .checkBody(param)
+          .isInt({ min: 0, allow_leading_zeroes: false })
+          .withMessage('contributionAmount must be a valid number greater than 0');
+
+      case 'contributionFrequency':
+        return req
+          .checkBody(param, 'contributionFrequency must be Weekly or Monthly')
+          .enum(['Weekly', 'Monthly']);
 
       default:
         return null;

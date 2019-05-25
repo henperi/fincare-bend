@@ -108,23 +108,19 @@ const validateStaffActions = {
 
       if (passedProfileParams.length === 0) {
         return response.badRequest(res, {
-          errors: {
-            param: 'profileObject',
-            message:
-              'Profile object is optional but if sent it must contain one or more optional keys',
-            optionalKeys: profileAcceptabelFields,
-          },
+          param: 'profileObject',
+          message:
+            'Profile object is optional but if sent it must contain one or more optional keys',
+          optionalKeys: profileAcceptabelFields,
         });
       }
 
       if (checkInvalidProfileObject.length > 0) {
         return response.badRequest(res, {
-          errors: {
-            param: 'profileObject',
-            message: 'You have sent invalid keys for the profile object',
-            invalidKeys: checkInvalidProfileObject,
-            acceptableKeys: profileAcceptabelFields,
-          },
+          param: 'profileObject',
+          message: 'You have sent invalid keys for the profile object',
+          invalidKeys: checkInvalidProfileObject,
+          acceptableKeys: profileAcceptabelFields,
         });
       }
 
@@ -142,23 +138,19 @@ const validateStaffActions = {
 
       if (passedAddressParams.length === 0) {
         return response.badRequest(res, {
-          errors: {
-            param: 'addressObject',
-            message:
-              'addressObject is optional but if sent it must contain one or more optional keys',
-            optionalKeys: addressAcceptableFields,
-          },
+          param: 'addressObject',
+          message:
+            'addressObject is optional but if sent it must contain one or more optional keys',
+          optionalKeys: addressAcceptableFields,
         });
       }
 
       if (passedAddressParams.length === 0 || checkInvalidAddressObject.length > 0) {
         return response.badRequest(res, {
-          errors: {
-            param: 'addressObject',
-            message: 'You have sent invalid keys for the address object',
-            invalidKeys: checkInvalidAddressObject,
-            acceptableKeys: addressAcceptableFields,
-          },
+          param: 'addressObject',
+          message: 'You have sent invalid keys for the address object',
+          invalidKeys: checkInvalidAddressObject,
+          acceptableKeys: addressAcceptableFields,
         });
       }
 
