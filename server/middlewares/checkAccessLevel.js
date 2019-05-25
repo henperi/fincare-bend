@@ -6,9 +6,7 @@ const checkAccessLevel = {
 
     if (level !== 'SuperAdmin') {
       return response.unAuthorized(res, {
-        errors: {
-          message: "You're not authorised to access this resource",
-        },
+        message: "You're not authorised to access this resource",
       });
     }
     return next();
@@ -19,9 +17,7 @@ const checkAccessLevel = {
 
     if (!['SuperAdmin', 'Admin', 'Officer'].includes(user.level)) {
       return response.unAuthorized(res, {
-        errors: {
-          message: "You're not authorised to access this resource",
-        },
+        message: "You're not authorised to access this resource",
       });
     }
 

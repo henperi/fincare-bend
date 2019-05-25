@@ -10,6 +10,10 @@ export default (sequelize, DataTypes) => {
   );
   AccountType.associate = (models) => {
     // associations can be defined here
+    AccountType.hasMany(models.FinAccount, {
+      foreignKey: 'actTypeId',
+      as: 'FinAccount',
+    });
   };
   return AccountType;
 };

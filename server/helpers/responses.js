@@ -23,51 +23,55 @@ const response = {
   /**
    *
    */
-  notFound: (res, data, code = 404) => res.status(code).json({
+  notFound: (res, errors, code = 404) => res.status(code).json({
     success: false,
-    data,
+    errors: [{ ...errors }],
   }),
 
   /**
    *
    */
-  forbidden: (res, data, code = 403) => res.status(code).json({
+  forbidden: (res, errors, code = 403) => res.status(code).json({
     success: false,
-    data,
+    errors: [{ ...errors }],
   }),
 
   /**
    *
    */
-  badRequest: (res, data, code = 400) => res.status(code).json({
+  badRequest: (res, errors, code = 400) => res.status(code).json({
     success: false,
-    data,
+    errors: errors.errors ? errors.errors : [{ ...errors }],
   }),
 
   /**
    *
    */
-  unAuthorized: (res, data, code = 401) => res.status(code).json({
+  unAuthorized: (res, errors, code = 401) => res.status(code).json({
     success: false,
-    data,
+    errors: [{ ...errors }],
   }),
 
   /**
    *
    */
-  alreadyExists: (res, data, code = 409) => res.status(code).json({
+  alreadyExists: (res, errors, code = 409) => res.status(code).json({
     success: false,
-    data,
+    errors: [{ ...errors }],
   }),
 
   /**
    *
    */
-  internalError: (res, data, code = 500) => {
-    console.log(data);
+  internalError: (res, errors, code = 500) => {
+    const err = process.env.NODE_ENV === 'production'
+      ? 'An error occured while processing your request, try again'
+      : errors;
+    if (process.env.NODE_ENV === 'development') console.log(err);
+
     res.status(code).json({
       success: false,
-      data,
+      errors: err,
     });
   },
 };

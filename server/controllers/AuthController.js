@@ -30,7 +30,7 @@ class AuthController {
 
       if (!staff) {
         return response.notFound(res, {
-          errors: [{ message: 'Invalid login credentials, have you forgotten your login details' }],
+          message: 'Invalid login credentials, have you forgotten your login details?',
         });
       }
 
@@ -38,7 +38,7 @@ class AuthController {
 
       if (!isPasswordValid) {
         return response.badRequest(res, {
-          errors: [{ message: 'Invalid login credentials, have you forgotten your login details' }],
+          message: 'Invalid login credentials, have you forgotten your login details',
         });
       }
 
@@ -70,12 +70,8 @@ class AuthController {
 
       if (!staff) {
         return response.notFound(res, {
-          errors: [
-            {
-              message:
-                'Unable to update your password, are you logged in? Please logout then login and try again',
-            },
-          ],
+          message:
+            'Unable to update your password, are you logged in? Please logout then login and try again',
         });
       }
 
@@ -83,9 +79,7 @@ class AuthController {
 
       if (!isPasswordValid) {
         return response.badRequest(res, {
-          errors: [
-            { message: 'Your old password is wrong, do you have issues remembering your password' },
-          ],
+          message: 'Your old password is wrong, do you have issues remembering your password',
         });
       }
 
