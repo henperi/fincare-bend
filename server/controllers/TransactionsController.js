@@ -1,12 +1,12 @@
-import Sequelize from 'sequelize';
-
 import model from '../models';
 import response from '../helpers/responses';
+import FinAccountRepo from '../repository/FinAccountRepo';
+import CustomerRepo from '../repository/CustomerRepo';
+import calcAvailableBalance from '../utils/calcAvailableBalance';
+import updateLedgerBalance from '../utils/updateLedgerBalance';
 
-const {
-  Customer, FinAccount, AccountType, Transaction,
-} = model;
-const { Op } = Sequelize;
+const { Transaction } = model;
+
 /**
  * Controller to handle neccessary staffActions
  */
@@ -26,22 +26,8 @@ class TransactionsController {
     const { id } = res.locals.user;
 
     try {
-      const findFinAccount = () => FinAccount.findOne({
-        where: {
-          [Op.or]: [{ accountNumber }],
-        },
-        include: [{ model: AccountType, as: 'AccountType' }],
-      }).catch((error) => {
-        throw new Error(error);
-      });
-
-      const findCustomer = () => Customer.findOne({
-        where: {
-          [Op.or]: [{ id: customerId }],
-        },
-      }).catch((error) => {
-        throw new Error(error);
-      });
+      const findFinAccount = () => FinAccountRepo.getByAccountNumber(accountNumber);
+      const findCustomer = () => CustomerRepo.getById(customerId);
 
       const [finAccount, customer] = await Promise.all([findFinAccount(), findCustomer()]);
 
@@ -63,10 +49,10 @@ class TransactionsController {
         });
       }
 
-      const availableBalance = finAccount.ledgerBalance - finAccount.outstandingBalance;
+      const availableBalance = calcAvailableBalance(finAccount);
 
       if (transactionType === 'Credit') {
-        if (amount <= finAccount.AccountType.minimumBalance) {
+        if (amount < finAccount.AccountType.minimumBalance) {
           return response.badRequest(res, {
             message: `The minimum allowed deposit on this account type is ${
               finAccount.AccountType.minimumBalance
@@ -105,18 +91,7 @@ class TransactionsController {
 
       let updatedAccount = {};
       if (recordedTransaction) {
-        if (transactionType === 'Credit') {
-          updatedAccount = await finAccount.update({
-            ledgerBalance: Number(finAccount.ledgerBalance) + Number(amount),
-            returning: true,
-          });
-        }
-        if (transactionType === 'Debit') {
-          updatedAccount = await finAccount.update({
-            ledgerBalance: Number(finAccount.ledgerBalance) - Number(amount),
-            returning: true,
-          });
-        }
+        updatedAccount = await updateLedgerBalance(transactionType, finAccount, amount);
       }
 
       const message = `${transactionType} Transaction of ${amount} has been completed successfully on ${accountNumber}`;

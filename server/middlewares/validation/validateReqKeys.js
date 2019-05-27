@@ -233,9 +233,9 @@ const validateReqKeys = (req, keys, object = null) => {
       case 'referenceNo':
         return req
           .checkBody(param)
-          .isLength({ min: 3 })
-          .withMessage('referenceNo must be 3 characters or more')
-          .isLength({ max: 15 })
+          .isLength({ min: 12 })
+          .withMessage('referenceNo must be a minimum of 12 characters')
+          .isLength({ max: 12 })
           .withMessage('referenceNo must not be greater than 15 characters');
 
       case 'description':
