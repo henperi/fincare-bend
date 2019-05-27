@@ -26,6 +26,10 @@ module.exports = {
     outstandingBalance: {
       type: Sequelize.DECIMAL,
     },
+    isDeleted: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+    },
     customerId: {
       type: Sequelize.INTEGER,
       allowNull: false,

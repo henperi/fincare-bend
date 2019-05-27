@@ -20,6 +20,10 @@ export default (sequelize, DataTypes) => {
       },
       customerId: DataTypes.INTEGER,
       actTypeId: DataTypes.STRING,
+      isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {},
   );

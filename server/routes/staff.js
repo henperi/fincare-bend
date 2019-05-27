@@ -86,4 +86,11 @@ staffRouter.put(
   StaffController.updateCustomer,
 );
 
+staffRouter.delete(
+  '/customer/:customerId',
+  checkAuth,
+  checkAccessLevel.isSupperAdmin,
+  StaffController.deleteCustomer,
+);
+
 export default staffRouter;

@@ -21,6 +21,10 @@ module.exports = {
     phone: {
       type: Sequelize.STRING,
     },
+    isDeleted: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+    },
     accountOfficerId: {
       type: Sequelize.INTEGER,
       allowNull: false,
