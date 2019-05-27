@@ -211,6 +211,41 @@ const validateReqKeys = (req, keys, object = null) => {
           .checkBody(param, 'contributionFrequency must be Weekly or Monthly')
           .enum(['Weekly', 'Monthly']);
 
+      case 'accountNumber':
+        return req
+          .checkBody(param)
+          .isInt()
+          .withMessage('accountNumber must be a valid 10 digit number')
+          .isLength({ min: 10, max: 10 })
+          .withMessage('accountNumber must be 10 digits only');
+
+      case 'transactionType':
+        return req
+          .checkBody(param, 'transactionType must be Credit or Debit')
+          .enum(['Credit', 'Debit']);
+
+      case 'amount':
+        return req
+          .checkBody(param)
+          .isInt({ gt: 0, allow_leading_zeroes: false })
+          .withMessage('amount must be a valid number greater than 0');
+
+      case 'referenceNo':
+        return req
+          .checkBody(param)
+          .isLength({ min: 12 })
+          .withMessage('referenceNo must be a minimum of 12 characters')
+          .isLength({ max: 12 })
+          .withMessage('referenceNo must not be greater than 15 characters');
+
+      case 'description':
+        return req
+          .checkBody(param)
+          .isLength({ min: 10 })
+          .withMessage('description must be 10 characters or more')
+          .isLength({ max: 300 })
+          .withMessage('description must not be greater than 300 characters');
+
       default:
         return null;
     }

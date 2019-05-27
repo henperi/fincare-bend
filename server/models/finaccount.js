@@ -33,6 +33,10 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'actTypeId',
       onUpdate: 'CASCADE',
     });
+    FinAccount.hasMany(models.Transaction, {
+      foreignKey: 'accountNumber',
+      as: 'Transactions',
+    });
   };
   return FinAccount;
 };
