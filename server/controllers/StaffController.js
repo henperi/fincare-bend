@@ -2,6 +2,8 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 import response from '../helpers/responses';
+import CustomerRepo from '../repository/CustomerRepo';
+import FinAccountRepo from '../repository/FinAccountRepo';
 
 const {
   CustomerProfile, Customer, Address, NextOfKin,
@@ -239,7 +241,7 @@ class StaffController {
   static async fetchAllCustomers(req, res) {
     try {
       const customers = await Customer.findAll({
-        where: {},
+        where: { isDeleted: false },
         include: [
           { model: Address, as: 'Address' },
           { model: CustomerProfile, as: 'Profile' },
@@ -333,6 +335,41 @@ class StaffController {
       const message = 'Customer updated successfully';
 
       return response.success(res, { message, updatedCustomer });
+    } catch (errors) {
+      return response.internalError(res, { errors });
+    }
+  }
+
+  /**
+   * @description Method to delete/update an existing Customer
+   *
+   * @param {object} req Request object containing the staff data
+   * @param {object} res Response object
+   * @return {object} JSON response
+   */
+  static async deleteCustomer(req, res) {
+    const { customerId } = req.params;
+
+    try {
+      const customer = await CustomerRepo.getById(customerId);
+
+      if (!customer) {
+        return response.notFound(res, {
+          message: "The customer you're trying to update was not found, please check and try again",
+        });
+      }
+
+      const deleteCustomer = () => CustomerRepo.deleteById(customerId);
+      const deleteFinAccount = () => FinAccountRepo.deleteByCustomerId(customerId);
+
+      const [deletedCustomer, deletedFinAccounts] = await Promise.all([
+        deleteCustomer(),
+        deleteFinAccount(),
+      ]);
+
+      const message = 'Customer and all his fincare accounts have been deleted successfully';
+
+      return response.success(res, { message, deletedCustomer, deletedFinAccounts });
     } catch (errors) {
       return response.internalError(res, { errors });
     }

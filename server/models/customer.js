@@ -8,6 +8,10 @@ export default (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       phone: DataTypes.STRING,
       accountOfficerId: DataTypes.INTEGER,
+      isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {},
   );
