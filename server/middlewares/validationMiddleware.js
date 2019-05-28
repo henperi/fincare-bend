@@ -64,7 +64,7 @@ const superAdminActions = {
   },
 
   validateCreateLoanType: (req, res, next) => {
-    requireFields(req, ['loanName', 'interestRate', 'maximumAmount', 'payCycle']);
+    requireFields(req, ['loanName', 'interestRate', 'minimumAmount', 'maximumAmount', 'payCycle']);
 
     validateReqKeys(req, Object.keys(req.body));
 

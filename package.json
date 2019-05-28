@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test npm run migrate:reset && cross-env NODE_ENV=test nyc mocha ./test/index.spec --require babel-register --exit --timeout 250000",
+    "test": "cross-env NODE_ENV=test npm run migrate:reset && cross-env NODE_ENV=test nyc mocha ./tests/index.spec --coverage --require babel-register --exit --timeout 250000",
+    "posttest": "npm run coverage",
     "seed": "babel-node server/db/seeders/index.js",
     "seed:admin": "babel-node server/db/seeders/seedSuperAdmin.js",
     "migrate": "sequelize db:migrate",
@@ -15,8 +16,7 @@
     "restart": "npm run build && npm run migrate:reset && node build/index.js",
     "start": "npm run build && npm run migrate && node build/index.js",
     "build": "babel ./server -d build/",
-    "coverage": "nyc report --reporter=text-lcov",
-    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=lcov"
   },
   "repository": {
     "type": "git",

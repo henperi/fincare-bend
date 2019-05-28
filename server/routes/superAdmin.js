@@ -77,7 +77,7 @@ superAdminRouter.post(
   '/loan-type/create',
   checkAuth,
   isSupperAdmin,
-  allowFields(['loanName', 'interestRate', 'maximumAmount', 'payCycle']),
+  allowFields(['loanName', 'interestRate', 'minimumAmount', 'maximumAmount', 'payCycle']),
   validateCreateLoanType,
   createLoanType,
 );

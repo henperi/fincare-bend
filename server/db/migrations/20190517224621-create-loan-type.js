@@ -12,6 +12,9 @@ module.exports = {
     interestRate: {
       type: Sequelize.INTEGER,
     },
+    minimumAmount: {
+      type: Sequelize.DECIMAL,
+    },
     maximumAmount: {
       type: Sequelize.DECIMAL,
     },

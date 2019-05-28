@@ -70,6 +70,12 @@ const validateReqKeys = (req, keys, object = null) => {
           .isInt({ min: 0, allow_leading_zeroes: false })
           .withMessage('minimumBalance must be a valid number greater 0');
 
+      case 'minimumAmount':
+        return req
+          .check('minimumAmount')
+          .isInt({ min: 0, allow_leading_zeroes: false })
+          .withMessage('minimumAmount must be a valid number greater 0');
+
       case 'maximumAmount':
         return req
           .check('maximumAmount')
@@ -215,7 +221,7 @@ const validateReqKeys = (req, keys, object = null) => {
         return req
           .checkBody(param)
           .isInt()
-          .withMessage('accountNumber must be a valid 10 digit number')
+          .withMessage('accountNumber must be composed of numbers only')
           .isLength({ min: 10, max: 10 })
           .withMessage('accountNumber must be 10 digits only');
 
