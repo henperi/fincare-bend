@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cross-env NODE_ENV=test npm run migrate:reset && cross-env NODE_ENV=test nyc mocha ./test/index.spec --require babel-register --exit --timeout 250000",
     "seed": "babel-node server/db/seeders/index.js",
     "seed:admin": "babel-node server/db/seeders/seedSuperAdmin.js",
     "migrate": "sequelize db:migrate",
@@ -47,6 +47,9 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "cross-env": "^5.2.0",
     "dotenv": "^8.0.0",
     "express": "^4.16.4",
     "express-rate-limit": "^4.0.1",
@@ -54,8 +57,10 @@
     "faker": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
+    "mocha": "^6.1.4",
     "morgan": "^1.9.1",
     "naija-phone-number": "^1.0.2",
+    "nyc": "^14.1.1",
     "pg": "^7.11.0",
     "sequelize": "^5.8.6",
     "sequelize-cli": "^5.4.0"

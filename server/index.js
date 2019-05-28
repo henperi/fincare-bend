@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 
 import formatErrors from './helpers/formatErrors';
 import router from './routes';
+import response from './helpers/responses';
 
 const app = express();
 
@@ -21,8 +22,12 @@ app.use(expressValidator(formatErrors()));
 app.use(limiter);
 
 app.use('/api/v1', router);
+app.use('/*', (req, res) => response.notFound(res, { message: 'This endpoint does not exist' }));
+
 const PORT = process.env.PORT || 3005;
 
 app.listen(PORT, () => {
   console.log(`connected on port ${PORT}`);
 });
+
+export default app;
