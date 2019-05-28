@@ -11,10 +11,7 @@ module.exports = {
     ...logQueries,
   },
   test: {
-    username: 'fincare_admin',
-    password: 'fincare_password',
-    database: 'fincare_test',
-    host: '127.0.0.1',
+    use_env_variable: 'TEST_DATABASE_URL',
     dialect: 'postgres',
     ...logQueries,
   },
