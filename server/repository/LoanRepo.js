@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 
-const { Loan } = model;
+const { Loan, LoanGaurantor } = model;
 const { Op } = Sequelize;
 /**
 
@@ -23,6 +23,40 @@ class LoanRepo {
     }).catch((error) => {
       throw new Error(error);
     });
+  }
+
+  /**
+   * Method to create a loan and include gaurantors
+   * @param {object} loanDetails with Request Object
+   * @return {object} LoanType
+   */
+  static createLoan(loanDetails) {
+    const {
+      loanRefNo,
+      amount,
+      purpose,
+      accountNumber,
+      customerId,
+      staffId,
+      loanTypeId,
+      gaurantorsArray,
+    } = loanDetails;
+
+    return Loan.create(
+      {
+        loanRefNo,
+        amount: Number(amount),
+        purpose,
+        accountNumber,
+        customerId,
+        staffId,
+        loanTypeId,
+        Gaurantors: [...gaurantorsArray],
+      },
+      {
+        include: [{ model: LoanGaurantor, as: 'Gaurantors' }],
+      },
+    );
   }
 }
 

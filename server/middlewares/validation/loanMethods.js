@@ -30,6 +30,7 @@ const loanMethods = {
         'relationship',
         'phone',
       ];
+
       gaurantorsArray.map((gaurantor, index) => {
         requireFields(req, gaurantorsAcceptableKeys, `gaurantorsArray[${index}]`);
         return validateReqKeys(req, Object.keys(gaurantor), `gaurantorsArray[${index}]`);

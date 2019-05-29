@@ -1,11 +1,10 @@
-import model from '../models';
 import response from '../helpers/responses';
 import FinAccountRepo from '../repository/FinAccountRepo';
 import LoanTypeRepo from '../repository/LoanTypeRepo';
 import CustomerRepo from '../repository/CustomerRepo';
 import LoanRepo from '../repository/LoanRepo';
+import generateRefNumber from '../helpers/generateRefNo';
 
-const { Loan, LoanGaurantor } = model;
 /**
  * Controller to handle neccessary loan requests
  */
@@ -81,22 +80,18 @@ class LoanController {
         });
       }
 
-      const newLoan = await Loan.create(
-        {
-          loanRefNo,
-          amount: Number(amount),
-          purpose,
-          accountNumber,
-          customerId,
-          staffId,
-          loanTypeId: loanType.id,
-          Gaurantors: [...gaurantorsArray],
-        },
-        {
-          include: [{ model: LoanGaurantor, as: 'Gaurantors' }],
-        },
-      );
+      const loanDetails = {
+        loanRefNo,
+        amount: Number(amount),
+        purpose,
+        accountNumber,
+        customerId,
+        staffId,
+        loanTypeId: loanType.id,
+        gaurantorsArray,
+      };
 
+      const newLoan = await LoanRepo.createLoan(loanDetails);
       const message = 'Customer Loan has been created successfully';
 
       return response.created(res, { message, newLoan });
