@@ -248,7 +248,7 @@ class SuperAdminController {
    */
   static async createLoanType(req, res) {
     const {
-      loanName: name, interestRate, maximumAmount, payCycle,
+      loanName: name, interestRate, minimumAmount, maximumAmount, payCycle,
     } = req.body;
 
     try {
@@ -271,6 +271,7 @@ class SuperAdminController {
       const newLoanType = await LoanType.create({
         name: name.trim(),
         interestRate,
+        minimumAmount,
         maximumAmount,
         payCycle,
       });

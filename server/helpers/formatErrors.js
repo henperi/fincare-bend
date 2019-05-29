@@ -1,4 +1,5 @@
 import naijaMobile from 'naija-phone-number';
+import banks from '../mocks/banks';
 
 const formatErrors = () => ({
   errorFormatter: (param, message, value) => {
@@ -18,6 +19,7 @@ const formatErrors = () => ({
   customValidators: {
     enum: (input, options) => options.includes(input),
     isNigerianMobile: mobile => naijaMobile.isValid(mobile),
+    checkBank: bankName => !!banks.find(bank => bank.name === bankName),
   },
 });
 

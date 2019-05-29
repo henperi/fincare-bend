@@ -5,6 +5,9 @@
  * @param {string} object
  * @returns {errors} an array of errors or null
  */
+
+import banks from '../../mocks/banks';
+
 const validateReqKeys = (req, keys, object = null) => {
   keys.map((key) => {
     const param = object ? `${object}[${key}]` : key;
@@ -14,7 +17,7 @@ const validateReqKeys = (req, keys, object = null) => {
         return req
           .checkBody(param)
           .isLength({ min: 3 })
-          .withMessage('firstName must be 3 characters or mores')
+          .withMessage('firstName must be 3 characters or more')
           .isLength({ max: 15 })
           .withMessage('firstName must not be greater than 15 characters');
 
@@ -22,7 +25,7 @@ const validateReqKeys = (req, keys, object = null) => {
         return req
           .checkBody(param)
           .isLength({ min: 3 })
-          .withMessage('lastName must be 3 characters or mores')
+          .withMessage('lastName must be 3 characters or more')
           .isLength({ max: 15 })
           .withMessage('lastName must not be greater than 15 characters');
 
@@ -38,7 +41,7 @@ const validateReqKeys = (req, keys, object = null) => {
         return req
           .checkBody(param)
           .isLength({ min: 3 })
-          .withMessage('fullName must be 3 characters or mores')
+          .withMessage('fullName must be 3 characters or more')
           .isLength({ max: 50 })
           .withMessage('fullName must not be greater than 50 characters');
 
@@ -46,15 +49,47 @@ const validateReqKeys = (req, keys, object = null) => {
         return req
           .checkBody(param)
           .isLength({ min: 3 })
-          .withMessage('loanName must be 3 characters or mores')
+          .withMessage('loanName must be 3 characters or more')
           .isLength({ max: 25 })
           .withMessage('loanName must not be greater than 25 characters');
+
+      case 'loanTypeName':
+        return req
+          .checkBody(param)
+          .isLength({ min: 3 })
+          .withMessage('loanTypeName must be 3 characters or more')
+          .isLength({ max: 25 })
+          .withMessage('loanTypeName must not be greater than 25 characters');
+
+      case 'occupation':
+        return req
+          .checkBody(param)
+          .isLength({ min: 3 })
+          .withMessage('occupation must be 3 characters or more')
+          .isLength({ max: 25 })
+          .withMessage('occupation must not be greater than 25 characters');
+
+      case 'placeOfwork':
+        return req
+          .checkBody(param)
+          .isLength({ min: 3 })
+          .withMessage('placeOfwork must be 3 characters or more')
+          .isLength({ max: 50 })
+          .withMessage('placeOfwork must not be greater than 50 characters');
+
+      case 'purpose':
+        return req
+          .checkBody(param)
+          .isLength({ min: 25 })
+          .withMessage('purpose must be 25 characters or more')
+          .isLength({ max: 200 })
+          .withMessage('purpose must not be greater than 200 characters');
 
       case 'accountName':
         return req
           .checkBody(param)
           .isLength({ min: 3 })
-          .withMessage('accountName must be 3 characters or mores')
+          .withMessage('accountName must be 3 characters or more')
           .isLength({ max: 25 })
           .withMessage('accountName must not be greater than 25 characters');
 
@@ -69,6 +104,12 @@ const validateReqKeys = (req, keys, object = null) => {
           .check('minimumBalance')
           .isInt({ min: 0, allow_leading_zeroes: false })
           .withMessage('minimumBalance must be a valid number greater 0');
+
+      case 'minimumAmount':
+        return req
+          .check('minimumAmount')
+          .isInt({ min: 0, allow_leading_zeroes: false })
+          .withMessage('minimumAmount must be a valid number greater 0');
 
       case 'maximumAmount':
         return req
@@ -215,9 +256,17 @@ const validateReqKeys = (req, keys, object = null) => {
         return req
           .checkBody(param)
           .isInt()
-          .withMessage('accountNumber must be a valid 10 digit number')
+          .withMessage('accountNumber must be composed of numbers only')
           .isLength({ min: 10, max: 10 })
           .withMessage('accountNumber must be 10 digits only');
+
+      case 'bvn':
+        return req
+          .checkBody(param)
+          .isInt()
+          .withMessage('bvn must be composed of numbers only')
+          .isLength({ min: 10, max: 10 })
+          .withMessage('bvn must be 10 digits only');
 
       case 'transactionType':
         return req
@@ -230,13 +279,59 @@ const validateReqKeys = (req, keys, object = null) => {
           .isInt({ gt: 0, allow_leading_zeroes: false })
           .withMessage('amount must be a valid number greater than 0');
 
+      case 'bank':
+        return req
+          .checkBody(
+            param,
+            `bank name sent is not valid, valid banks include [${banks.map(bank => bank.name)}]`,
+          )
+          .checkBank(req.body.param);
+
+      case 'bankName':
+        return req
+          .checkBody(
+            param,
+            `bank name sent is not valid, valid banks include [${banks.map(bank => bank.name)}]`,
+          )
+          .checkBank(req.body.param);
+
+      case 'monthlyIncome':
+        return req
+          .checkBody(param)
+          .isInt({ gt: 0, allow_leading_zeroes: false })
+          .withMessage('monthlyIncome must be a valid number greater than 0');
+
       case 'referenceNo':
         return req
           .checkBody(param)
           .isLength({ min: 12 })
           .withMessage('referenceNo must be a minimum of 12 characters')
           .isLength({ max: 12 })
-          .withMessage('referenceNo must not be greater than 15 characters');
+          .withMessage('referenceNo must not be greater than 12 characters');
+
+      case 'bankAcctType':
+        return req
+          .checkBody(param)
+          .isLength({ min: 5 })
+          .withMessage('bankAcctType must be a minimum of 5 characters')
+          .isLength({ max: 25 })
+          .withMessage('bankAcctType must not be greater than 25 characters');
+
+      case 'employerName':
+        return req
+          .checkBody(param)
+          .isLength({ min: 3 })
+          .withMessage('employerName must be a minimum of 3 characters')
+          .isLength({ max: 35 })
+          .withMessage('employerName must not be greater than 35 characters');
+
+      case 'loanRefNo':
+        return req
+          .checkBody(param)
+          .isLength({ min: 12 })
+          .withMessage('loanRefNo must be a minimum of 12 characters')
+          .isLength({ max: 12 })
+          .withMessage('loanRefNo must not be greater than 12 characters');
 
       case 'description':
         return req
