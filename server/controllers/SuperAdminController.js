@@ -4,6 +4,7 @@ import model from '../models';
 import response from '../helpers/responses';
 import { hashPassword } from '../helpers/passwordHelpers';
 import generateStaffId from '../helpers/generateStaffId';
+import generateRefNumber from '../helpers/generateRefNo';
 
 const {
   AccountType, LoanType, Staff, StaffProfile,
@@ -41,6 +42,7 @@ class SuperAdminController {
         {
           email: email.trim(),
           uniqueId: generateStaffId(),
+          secreteKey: `${generateRefNumber(10)}-${email}`,
           password: hashedPassword,
           level: staffLevel,
           Profile: {
@@ -52,6 +54,7 @@ class SuperAdminController {
       );
 
       newStaff.password = undefined;
+      newStaff.secreteKey = undefined;
       const message = `Staff ${staffLevel} created successfully`;
 
       return response.created(res, { message, newStaff });

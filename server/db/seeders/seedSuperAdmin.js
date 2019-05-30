@@ -7,6 +7,7 @@ import model from '../../models';
 import generateAuthToken from '../../helpers/generateAuthToken';
 import generateStaffId from '../../helpers/generateStaffId';
 import { hashPassword } from '../../helpers/passwordHelpers';
+import generateRefNumber from '../../helpers/generateRefNo';
 
 const { Op } = Sequelize;
 
@@ -41,6 +42,7 @@ const seedSuperAdmin = () => {
       const superAdmin = await Staff.create(
         {
           uniqueId: generateStaffId(),
+          secreteKey: `${generateRefNumber(10)}-${SU_EMAIL}`,
           email: SU_EMAIL,
           password: hashedPassword,
           level: 'SuperAdmin',

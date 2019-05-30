@@ -3,7 +3,6 @@ import FinAccountRepo from '../repository/FinAccountRepo';
 import LoanTypeRepo from '../repository/LoanTypeRepo';
 import CustomerRepo from '../repository/CustomerRepo';
 import LoanRepo from '../repository/LoanRepo';
-import generateRefNumber from '../helpers/generateRefNo';
 
 /**
  * Controller to handle neccessary loan requests
@@ -17,7 +16,7 @@ class LoanController {
    */
   static async createLoan(req, res) {
     const {
-      amount, loanRefNo, loanTypeName, purpose, gaurantorsArray,
+      requestAmount, loanRefNo, loanTypeName, purpose, gaurantorsArray, duration,
     } = req.body;
 
     const { customerId, accountNumber } = req.params;
@@ -66,29 +65,30 @@ class LoanController {
         });
       }
 
-      const { minimumAmount, maximumAmount } = finAccount;
+      const { minimumAmount, maximumAmount } = loanType;
 
-      if (amount < minimumAmount) {
+      if (requestAmount < minimumAmount) {
         return response.badRequest(res, {
           message: `Unable to process this loan application, as it is below the minimum loanable amount of ${minimumAmount}`,
         });
       }
 
-      if (amount > maximumAmount) {
+      if (requestAmount > maximumAmount) {
         return response.badRequest(res, {
-          message: `Unable to process this loan application, as it is above the maximum loanable amount of ${minimumAmount}`,
+          message: `Unable to process this loan application, as it is above the maximum loanable amount of ${maximumAmount}`,
         });
       }
 
       const loanDetails = {
         loanRefNo,
-        amount: Number(amount),
+        duration,
         purpose,
         accountNumber,
         customerId,
         staffId,
-        loanTypeId: loanType.id,
         gaurantorsArray,
+        requestAmount: Number(requestAmount),
+        loanTypeId: loanType.id,
       };
 
       const newLoan = await LoanRepo.createLoan(loanDetails);
@@ -98,6 +98,61 @@ class LoanController {
     } catch (error) {
       return response.internalError(res, { error });
     }
+  }
+
+  /**
+   * Method to approve a loan request
+   * @param {object} req with Request Object
+   * @param {object} res Response Object
+   * @return {object} JSON response
+   */
+  static async approveLoan(req, res) {
+    const { approvedAmount } = req.body;
+    const { customerId, loanRefNo } = req.params;
+    // const { id: staffId } = res.locals.user;
+
+    const findLoan = () => LoanRepo.getByLoanRefNo(loanRefNo);
+    const findCustomer = () => CustomerRepo.getById(customerId);
+
+    const [loan, customer] = await Promise.all([findLoan(), findCustomer()]);
+
+    if (!loan) {
+      return response.notFound(res, {
+        message: 'There is no loan with such a loanRefNo',
+      });
+    }
+    if (!customer) {
+      return response.notFound(res, {
+        message: 'There is no customer with such an id',
+      });
+    }
+
+    const {
+      LoanType: { minimumAmount, maximumAmount },
+    } = loan;
+
+    if (Number(approvedAmount) < Number(minimumAmount)) {
+      return response.badRequest(res, {
+        message: `Unable to complete this loan approval, approvedAmount should be equal or greater than the minimum loanable amount of N${minimumAmount}`,
+      });
+    }
+
+    if (Number(approvedAmount) > Number(maximumAmount)) {
+      return response.badRequest(res, {
+        message: `Unable to complete this loan approval, approvedAmount should be equal or less than the maximum loanable amount of N${maximumAmount}`,
+      });
+    }
+
+    /**
+     * Step 1: calculate the interest
+     * Step 2: Record the repayments
+     * Remember to the above on a follow up story
+     */
+
+    // Step 3: approve the loan
+    const approvedLoan = await loan.update({ approvedAmount, approvalStatus: 'approved' });
+
+    return response.success(res, { approvedLoan });
   }
 }
 

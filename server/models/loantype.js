@@ -3,7 +3,7 @@ export default (sequelize, DataTypes) => {
     'LoanType',
     {
       name: DataTypes.STRING,
-      interestRate: DataTypes.INTEGER,
+      interestRate: DataTypes.DECIMAL,
       minimumAmount: DataTypes.DECIMAL,
       maximumAmount: DataTypes.DECIMAL,
       payCycle: DataTypes.STRING,

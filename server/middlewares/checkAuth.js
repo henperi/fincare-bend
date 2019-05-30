@@ -12,6 +12,7 @@ const checkAuth = async (req, res, next) => {
 
   if (!token) {
     return response.badRequest(res, {
+      issue: 'token',
       message: 'Authentication issues, kindly login and try again',
     });
   }
@@ -19,14 +20,37 @@ const checkAuth = async (req, res, next) => {
   try {
     const verifiedToken = await jwt.verify(token, process.env.JWT_SECRET);
     const {
-      email, uniqueId, id, level,
+      email, uniqueId, id, level, secreteKey, exp,
     } = verifiedToken;
 
-    const staff = await Staff.findOne({ where: { id, email, uniqueId } });
+    const today = new Date();
+
+    const staff = await Staff.findOne({
+      where: {
+        id,
+        email,
+        uniqueId,
+      },
+    });
 
     if (!staff) {
       return response.notFound(res, {
+        issue: 'token',
         message: 'Opps... Account issues, are you logged in? please loggout and login again',
+      });
+    }
+
+    if (staff.secreteKey !== secreteKey) {
+      return response.notFound(res, {
+        issue: 'token',
+        message: 'Opps... SecreteKey issues, please logout and login to your account again',
+      });
+    }
+
+    if (today.getTime() / 1000 > exp) {
+      return response.notFound(res, {
+        issue: 'token',
+        message: 'Opps... Token expiration issues, please logout and login to your account again',
       });
     }
 
@@ -36,6 +60,7 @@ const checkAuth = async (req, res, next) => {
       id,
       level,
     };
+
     return next();
   } catch (errors) {
     return response.unAuthorized(res, {

@@ -4,7 +4,14 @@ import requireFields from './requireFields';
 
 const loanMethods = {
   validateCreateLoan: (req, res, next) => {
-    requireFields(req, ['amount', 'loanRefNo', 'loanTypeName', 'purpose', 'gaurantorsArray']);
+    requireFields(req, [
+      'requestAmount',
+      'loanRefNo',
+      'loanTypeName',
+      'purpose',
+      'gaurantorsArray',
+      'duration',
+    ]);
 
     const { gaurantorsArray } = req.body;
 
@@ -36,6 +43,19 @@ const loanMethods = {
         return validateReqKeys(req, Object.keys(gaurantor), `gaurantorsArray[${index}]`);
       });
     }
+
+    validateReqKeys(req, Object.keys(req.body));
+
+    const errors = req.validationErrors();
+    if (errors) {
+      return response.badRequest(res, { errors });
+    }
+
+    return next();
+  },
+
+  validateApproveLoan: (req, res, next) => {
+    requireFields(req, ['approvedAmount']);
 
     validateReqKeys(req, Object.keys(req.body));
 

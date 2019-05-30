@@ -4,7 +4,7 @@ export default (sequelize, DataTypes) => {
     {
       name: DataTypes.STRING,
       interestRate: DataTypes.INTEGER,
-      minimumBalance: DataTypes.INTEGER,
+      minimumBalance: DataTypes.DECIMAL,
     },
     {},
   );

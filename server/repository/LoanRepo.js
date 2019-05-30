@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 
-const { Loan, LoanGaurantor } = model;
+const { Loan, LoanGaurantor, LoanType } = model;
 const { Op } = Sequelize;
 /**
 
@@ -20,6 +20,7 @@ class LoanRepo {
       where: {
         [Op.or]: [{ loanRefNo }],
       },
+      include: [{ model: LoanType, as: 'LoanType' }],
     }).catch((error) => {
       throw new Error(error);
     });
@@ -33,24 +34,26 @@ class LoanRepo {
   static createLoan(loanDetails) {
     const {
       loanRefNo,
-      amount,
+      requestAmount,
       purpose,
       accountNumber,
       customerId,
       staffId,
       loanTypeId,
       gaurantorsArray,
+      duration,
     } = loanDetails;
 
     return Loan.create(
       {
         loanRefNo,
-        amount: Number(amount),
+        duration,
         purpose,
         accountNumber,
         customerId,
         staffId,
         loanTypeId,
+        requestAmount: Number(requestAmount),
         Gaurantors: [...gaurantorsArray],
       },
       {
