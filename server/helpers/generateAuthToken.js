@@ -1,7 +1,13 @@
 import jwt from 'jsonwebtoken';
 
 const generateAuthToken = ({
-  id, uniqueId, email, Profile: { fullname }, phone, level,
+  id,
+  uniqueId,
+  email,
+  Profile: { fullname },
+  phone,
+  level,
+  secreteKey,
 }) => {
   try {
     return jwt.sign(
@@ -12,10 +18,11 @@ const generateAuthToken = ({
         email,
         phone,
         level,
+        secreteKey,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '5d',
+        expiresIn: '10d',
       },
     );
   } catch (error) {

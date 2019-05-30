@@ -10,7 +10,7 @@ module.exports = {
       type: Sequelize.STRING,
     },
     interestRate: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.DECIMAL,
     },
     minimumBalance: {
       type: Sequelize.DECIMAL,

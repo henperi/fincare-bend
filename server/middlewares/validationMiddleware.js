@@ -64,10 +64,16 @@ const superAdminActions = {
   },
 
   validateCreateLoanType: (req, res, next) => {
+    const { minimumAmount, maximumAmount } = req.body;
     requireFields(req, ['loanName', 'interestRate', 'minimumAmount', 'maximumAmount', 'payCycle']);
 
     validateReqKeys(req, Object.keys(req.body));
 
+    if (Number(minimumAmount) > Number(maximumAmount)) {
+      return response.badRequest(res, {
+        message: 'The minimum amount cannot be greater than the maximum amount',
+      });
+    }
     const errors = req.validationErrors();
     if (errors) {
       return response.badRequest(res, { errors });

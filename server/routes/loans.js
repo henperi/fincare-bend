@@ -8,13 +8,35 @@ import LoanController from '../controllers/LoanController';
 
 const loanRouter = express.Router();
 
+/**
+ * Request a loan
+ */
 loanRouter.post(
   '/create/:customerId/:accountNumber',
   checkAuth,
   checkAccessLevel.isStaff,
-  allowFields(['amount', 'loanRefNo', 'loanTypeName', 'purpose', 'gaurantorsArray']),
+  allowFields([
+    'requestAmount',
+    'loanRefNo',
+    'loanTypeName',
+    'purpose',
+    'gaurantorsArray',
+    'duration',
+  ]),
   loanMethods.validateCreateLoan,
   LoanController.createLoan,
+);
+
+/**
+ * Approve a loan
+ */
+loanRouter.post(
+  '/approve/:customerId/:loanRefNo',
+  checkAuth,
+  checkAccessLevel.isAdmin,
+  allowFields(['approvedAmount']),
+  loanMethods.validateApproveLoan,
+  LoanController.approveLoan,
 );
 
 export default loanRouter;

@@ -2,13 +2,16 @@ module.exports = (sequelize, DataTypes) => {
   const Loan = sequelize.define(
     'Loan',
     {
-      amount: DataTypes.DECIMAL,
       loanRefNo: DataTypes.STRING,
+      requestAmount: DataTypes.DECIMAL,
+      approvedAmount: DataTypes.DECIMAL,
       loanTypeId: DataTypes.INTEGER,
       accountNumber: DataTypes.BIGINT,
       customerId: DataTypes.INTEGER,
       staffId: DataTypes.INTEGER,
       purpose: DataTypes.TEXT,
+      duration: DataTypes.STRING,
+      approvalStatus: { type: DataTypes.STRING, defaultValue: 'pending' },
     },
     {},
   );

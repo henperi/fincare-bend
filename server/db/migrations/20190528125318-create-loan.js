@@ -9,11 +9,21 @@ module.exports = {
     loanRefNo: {
       type: Sequelize.STRING,
     },
-    amount: {
+    requestAmount: {
+      type: Sequelize.DECIMAL,
+    },
+    approvedAmount: {
       type: Sequelize.DECIMAL,
     },
     purpose: {
       type: Sequelize.TEXT,
+    },
+    approvalStatus: {
+      type: Sequelize.STRING,
+      defaultValue: 'pending',
+    },
+    duration: {
+      type: Sequelize.STRING,
     },
     accountNumber: {
       type: Sequelize.BIGINT,

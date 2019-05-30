@@ -7,6 +7,7 @@
  */
 
 import banks from '../../mocks/banks';
+import duration from '../../mocks/duration';
 
 const validateReqKeys = (req, keys, object = null) => {
   keys.map((key) => {
@@ -96,7 +97,7 @@ const validateReqKeys = (req, keys, object = null) => {
       case 'interestRate':
         return req
           .check('interestRate')
-          .isInt({ min: 0, max: 100, allow_leading_zeroes: false })
+          .isFloat({ min: 0, max: 100 })
           .withMessage('interestRate must be a valid number between 0 and 100');
 
       case 'minimumBalance':
@@ -273,11 +274,28 @@ const validateReqKeys = (req, keys, object = null) => {
           .checkBody(param, 'transactionType must be Credit or Debit')
           .enum(['Credit', 'Debit']);
 
+      case 'duration':
+        return req
+          .checkBody(param, `duration must be one of the following: ${duration}`)
+          .enum(duration);
+
       case 'amount':
         return req
           .checkBody(param)
           .isInt({ gt: 0, allow_leading_zeroes: false })
           .withMessage('amount must be a valid number greater than 0');
+
+      case 'requestAmount':
+        return req
+          .checkBody(param)
+          .isInt({ gt: 0, allow_leading_zeroes: false })
+          .withMessage('requestAmount must be a valid number greater than 0');
+
+      case 'approvedAmount':
+        return req
+          .checkBody(param)
+          .isInt({ gt: 0, allow_leading_zeroes: false })
+          .withMessage('approvedAmount must be a valid number greater than 0');
 
       case 'bank':
         return req
