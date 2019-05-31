@@ -1,8 +1,14 @@
+import { range } from 'lodash';
+import moment from 'moment';
+
+import model from '../models';
 import response from '../helpers/responses';
 import FinAccountRepo from '../repository/FinAccountRepo';
 import LoanTypeRepo from '../repository/LoanTypeRepo';
 import CustomerRepo from '../repository/CustomerRepo';
 import LoanRepo from '../repository/LoanRepo';
+
+const { Repayment } = model;
 
 /**
  * Controller to handle neccessary loan requests
@@ -67,13 +73,13 @@ class LoanController {
 
       const { minimumAmount, maximumAmount } = loanType;
 
-      if (requestAmount < minimumAmount) {
+      if (Number(requestAmount) < Number(minimumAmount)) {
         return response.badRequest(res, {
           message: `Unable to process this loan application, as it is below the minimum loanable amount of ${minimumAmount}`,
         });
       }
 
-      if (requestAmount > maximumAmount) {
+      if (Number(requestAmount) > Number(maximumAmount)) {
         return response.badRequest(res, {
           message: `Unable to process this loan application, as it is above the maximum loanable amount of ${maximumAmount}`,
         });
@@ -128,7 +134,11 @@ class LoanController {
     }
 
     const {
-      LoanType: { minimumAmount, maximumAmount },
+      duration,
+      requestAmount,
+      LoanType: {
+        minimumAmount, maximumAmount, interestRate, payCycle,
+      },
     } = loan;
 
     if (Number(approvedAmount) < Number(minimumAmount)) {
@@ -143,16 +153,60 @@ class LoanController {
       });
     }
 
-    /**
-     * Step 1: calculate the interest
-     * Step 2: Record the repayments
-     * Remember to the above on a follow up story
-     */
+    if (Number(approvedAmount) > Number(requestAmount)) {
+      return response.badRequest(res, {
+        message: `Unable to complete this loan approval, approvedAmount should be equal or less than the requested amount of N${requestAmount}`,
+      });
+    }
 
-    // Step 3: approve the loan
+    if (['approved', 'rejected'].includes(loan.approvalStatus)) {
+      return response.badRequest(res, {
+        message: `Unable to complete this loan approval request as it has already been ${
+          loan.approvalStatus
+        }`,
+      });
+    }
+
+    const durationCount = duration[0];
+    const payCycleCount = payCycle === 'Monthly' ? 1 : 4;
+    const descriptionType = payCycle === 'Monthly' ? 'month' : 'week';
+    const numberOfPayments = Number(durationCount) * Number(payCycleCount);
+
+    const interest = approvedAmount * durationCount * (interestRate / 100);
+    const totalPaybackAmount = Number(approvedAmount) + Number(interest);
+
+    const averagePay = totalPaybackAmount / numberOfPayments;
+    const incrementalDays = payCycle === 'Monthly' ? 28 : 7;
+
+    const repayments = [];
+
     const approvedLoan = await loan.update({ approvedAmount, approvalStatus: 'approved' });
 
-    return response.success(res, { approvedLoan });
+    if (approvedLoan.approvalStatus === 'approved') {
+      range(numberOfPayments).map(number => repayments.push({
+        description: `${descriptionType} ${number + 1}`,
+        dueDate: moment(new Date().getTime() + 86400000 * incrementalDays * (number + 1)).format(
+          'dddd, MMMM DD, YYYY hh:mm:ssA',
+        ),
+        paymentStatus: false,
+        dueAmount: averagePay,
+        loanId: loan.id,
+      }));
+    }
+
+    await Repayment.bulkCreate(repayments);
+
+    const message = 'Loan has been approved successfully and the repayment dates have been calculated';
+
+    return response.success(res, {
+      message,
+      loanRefNo,
+      requestAmount,
+      approvedAmount,
+      totalPaybackAmount,
+      numberOfPayments,
+      repayments,
+    });
   }
 }
 
