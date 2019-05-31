@@ -1,8 +1,15 @@
+import { range } from 'lodash';
+import moment from 'moment';
+
+import model from '../models';
 import response from '../helpers/responses';
 import FinAccountRepo from '../repository/FinAccountRepo';
 import LoanTypeRepo from '../repository/LoanTypeRepo';
 import CustomerRepo from '../repository/CustomerRepo';
 import LoanRepo from '../repository/LoanRepo';
+import createLoanRepayments from '../utils/createLoanRepayments';
+
+const { Repayment, sequelize } = model;
 
 /**
  * Controller to handle neccessary loan requests
@@ -67,13 +74,13 @@ class LoanController {
 
       const { minimumAmount, maximumAmount } = loanType;
 
-      if (requestAmount < minimumAmount) {
+      if (Number(requestAmount) < Number(minimumAmount)) {
         return response.badRequest(res, {
           message: `Unable to process this loan application, as it is below the minimum loanable amount of ${minimumAmount}`,
         });
       }
 
-      if (requestAmount > maximumAmount) {
+      if (Number(requestAmount) > Number(maximumAmount)) {
         return response.badRequest(res, {
           message: `Unable to process this loan application, as it is above the maximum loanable amount of ${maximumAmount}`,
         });
@@ -109,50 +116,72 @@ class LoanController {
   static async approveLoan(req, res) {
     const { approvedAmount } = req.body;
     const { customerId, loanRefNo } = req.params;
-    // const { id: staffId } = res.locals.user;
-
     const findLoan = () => LoanRepo.getByLoanRefNo(loanRefNo);
     const findCustomer = () => CustomerRepo.getById(customerId);
 
-    const [loan, customer] = await Promise.all([findLoan(), findCustomer()]);
+    try {
+      const [loan, customer] = await Promise.all([findLoan(), findCustomer()]);
 
-    if (!loan) {
-      return response.notFound(res, {
-        message: 'There is no loan with such a loanRefNo',
+      if (!loan) {
+        return response.notFound(res, {
+          message: 'There is no loan with such a loanRefNo',
+        });
+      }
+      if (!customer) {
+        return response.notFound(res, {
+          message: 'There is no customer with such an id',
+        });
+      }
+
+      const {
+        requestAmount,
+        LoanType: { minimumAmount, maximumAmount },
+      } = loan;
+
+      if (Number(approvedAmount) < Number(minimumAmount)) {
+        return response.badRequest(res, {
+          message: `Unable to complete this loan approval, approvedAmount should be equal or greater than the minimum loanable amount of N${minimumAmount}`,
+        });
+      }
+
+      if (Number(approvedAmount) > Number(maximumAmount)) {
+        return response.badRequest(res, {
+          message: `Unable to complete this loan approval, approvedAmount should be equal or less than the maximum loanable amount of N${maximumAmount}`,
+        });
+      }
+
+      if (Number(approvedAmount) > Number(requestAmount)) {
+        return response.badRequest(res, {
+          message: `Unable to complete this loan approval, approvedAmount should be equal or less than the requested amount of N${requestAmount}`,
+        });
+      }
+
+      if (['approved', 'rejected'].includes(loan.approvalStatus)) {
+        return response.badRequest(res, {
+          message: `Unable to complete this loan approval request as it has already been ${
+            loan.approvalStatus
+          }`,
+        });
+      }
+
+      const { repayments, totalPaybackAmount, numberOfPayments } = await createLoanRepayments(
+        loan,
+        approvedAmount,
+      );
+      const message = 'Loan has been approved successfully and the repayment dates have been calculated';
+
+      return response.success(res, {
+        message,
+        loanRefNo,
+        requestAmount,
+        approvedAmount,
+        totalPaybackAmount,
+        numberOfPayments,
+        repayments,
       });
+    } catch (error) {
+      return response.internalError(res, { error });
     }
-    if (!customer) {
-      return response.notFound(res, {
-        message: 'There is no customer with such an id',
-      });
-    }
-
-    const {
-      LoanType: { minimumAmount, maximumAmount },
-    } = loan;
-
-    if (Number(approvedAmount) < Number(minimumAmount)) {
-      return response.badRequest(res, {
-        message: `Unable to complete this loan approval, approvedAmount should be equal or greater than the minimum loanable amount of N${minimumAmount}`,
-      });
-    }
-
-    if (Number(approvedAmount) > Number(maximumAmount)) {
-      return response.badRequest(res, {
-        message: `Unable to complete this loan approval, approvedAmount should be equal or less than the maximum loanable amount of N${maximumAmount}`,
-      });
-    }
-
-    /**
-     * Step 1: calculate the interest
-     * Step 2: Record the repayments
-     * Remember to the above on a follow up story
-     */
-
-    // Step 3: approve the loan
-    const approvedLoan = await loan.update({ approvedAmount, approvalStatus: 'approved' });
-
-    return response.success(res, { approvedLoan });
   }
 }
 
