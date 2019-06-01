@@ -4,7 +4,7 @@ import model from '../models';
 import RepaymentRepo from './RepaymentsRepo';
 
 const {
-  Loan, LoanGaurantor, LoanType, sequelize,
+  Loan, LoanGaurantor, LoanType, Customer, sequelize,
 } = model;
 const { Op } = Sequelize;
 /**
@@ -13,6 +13,34 @@ const { Op } = Sequelize;
  * Controller to handle neccessary staffActions
  */
 class LoanRepo {
+  /**
+   * Method to get all loans
+   * @return {array} Array of loans
+   */
+  static getAll() {
+    return Loan.findAll({
+      include: [{ model: LoanType, as: 'LoanType' }, { model: Customer, as: 'Customer' }],
+    }).catch((error) => {
+      throw new Error(error);
+    });
+  }
+
+  /**
+   * Method to get a loan by the id
+   * @param {string} id with Request Object
+   * @return {object} LoanType
+   */
+  static getById(id) {
+    return Loan.findOne({
+      where: {
+        [Op.or]: [{ id }],
+      },
+      include: [{ model: LoanType, as: 'LoanType' }, { model: Customer, as: 'Customer' }],
+    }).catch((error) => {
+      throw new Error(error);
+    });
+  }
+
   /**
    * Method to get a loan by the loanRefNo
    * @param {string} loanRefNo with Request Object

@@ -49,4 +49,14 @@ loanRouter.post(
   LoanController.rejectLoan,
 );
 
+/**
+ * fetch all loans
+ */
+loanRouter.get('/', checkAuth, checkAccessLevel.isStaff, LoanController.fetchAllLoans);
+
+/**
+ * fetch a loan by its Id
+ */
+loanRouter.get('/:loanId', checkAuth, checkAccessLevel.isStaff, LoanController.fetchLoanById);
+
 export default loanRouter;
