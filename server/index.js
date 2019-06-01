@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import expressValidator from 'express-validator';
 import rateLimit from 'express-rate-limit';
+import cors from 'cors';
 
 import formatErrors from './helpers/formatErrors';
 import router from './routes';
@@ -15,6 +16,7 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
 });
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan('dev'));
