@@ -216,6 +216,49 @@ class LoanController {
       return response.internalError(res, { error });
     }
   }
+
+  /**
+   * Method to fetch all loans
+   * @param {object} req with Request Object
+   * @param {object} res Response Object
+   * @return {object} JSON response
+   */
+  static async fetchAllLoans(req, res) {
+    try {
+      const allLoans = await LoanRepo.getAll();
+
+      const message = 'Array of 0 or more loans has been fetched successfully';
+
+      return response.success(res, { message, allLoans });
+    } catch (error) {
+      return response.internalError(res, { error });
+    }
+  }
+
+  /**
+   * Method to fetch a loan by its loanRefNO
+   * @param {object} req with Request Object
+   * @param {object} res Response Object
+   * @return {object} JSON response
+   */
+  static async fetchLoanById(req, res) {
+    const { loanId } = req.params;
+    try {
+      const loan = await LoanRepo.getById(loanId);
+
+      if (!loan) {
+        return response.notFound(res, {
+          message: 'There is no loan with such a loanRefNo',
+        });
+      }
+
+      const message = 'Loan has been fetched successfully';
+
+      return response.success(res, { message, loan });
+    } catch (error) {
+      return response.internalError(res, { error });
+    }
+  }
 }
 
 export default LoanController;
