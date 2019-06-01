@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 
-const { FinAccount, AccountType } = model;
+const { FinAccount, AccountType, Customer } = model;
 const { Op } = Sequelize;
 /**
 
@@ -10,6 +10,18 @@ const { Op } = Sequelize;
  * Controller to handle neccessary staffActions
  */
 class FinAccountRepo {
+  /**
+   * Method to get all finAccounts
+   * @return {array} Array of loans
+   */
+  static getAll() {
+    return FinAccount.findAll({
+      include: [{ model: AccountType, as: 'AccountType' }, { model: Customer, as: 'Customer' }],
+    }).catch((error) => {
+      throw new Error(error);
+    });
+  }
+
   /**
    * Method to get a fincare account by the accountNumber
    * @param {object} accountNumber with Request Object
