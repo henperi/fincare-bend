@@ -4,6 +4,7 @@ import model from '../models';
 import response from '../helpers/responses';
 import CustomerRepo from '../repository/CustomerRepo';
 import FinAccountRepo from '../repository/FinAccountRepo';
+import StaffRepo from '../repository/StaffRepo';
 
 const {
   CustomerProfile, Customer, Address, NextOfKin,
@@ -13,6 +14,49 @@ const { Op } = Sequelize;
  * Controller to handle neccessary staffActions
  */
 class StaffController {
+  /**
+   * Method to fetch all staffs
+   * @param {object} req with Request Object
+   * @param {object} res Response Object
+   * @return {object} JSON response
+   */
+  static async fetchAllStaffs(req, res) {
+    try {
+      const allStaff = await StaffRepo.getAll();
+
+      const message = 'Array of 0 or more staffs has been fetched successfully';
+
+      return response.success(res, { message, allStaff });
+    } catch (error) {
+      return response.internalError(res, { error });
+    }
+  }
+
+  /**
+   * Method to fetch a staff by the id
+   * @param {object} req with Request Object
+   * @param {object} res Response Object
+   * @return {object} JSON response
+   */
+  static async fetchById(req, res) {
+    const { staffId } = req.params;
+    try {
+      const staff = await StaffRepo.getById(staffId);
+
+      if (!staff) {
+        return response.notFound(res, {
+          message: 'There is no staff with such an id',
+        });
+      }
+
+      const message = 'staff has been fetched successfully';
+
+      return response.success(res, { message, staff });
+    } catch (error) {
+      return response.internalError(res, { error });
+    }
+  }
+
   /**
    * Method to create a customer
    * @param {object} req with Customer data
