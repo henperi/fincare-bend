@@ -5,8 +5,6 @@ import checkAuth from '../middlewares/checkAuth';
 import StaffController from '../controllers/StaffController';
 import validateStaffActions from '../middlewares/validation/staffActions';
 import allowFields from '../middlewares/allowFields';
-import FinAccountController from '../controllers/finAccountController';
-import finAccountMethods from '../middlewares/validation/finMethods';
 
 const staffRouter = express.Router();
 
@@ -92,5 +90,15 @@ staffRouter.delete(
   checkAccessLevel.isSupperAdmin,
   StaffController.deleteCustomer,
 );
+
+/**
+ * Fetch all staffs
+ */
+staffRouter.get('/', checkAuth, checkAccessLevel.isAdmin, StaffController.fetchAllStaffs);
+
+/**
+ * Fetch a staff
+ */
+staffRouter.get('/:staffId', checkAuth, checkAccessLevel.isAdmin, StaffController.fetchById);
 
 export default staffRouter;
