@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 
-const { Customer } = model;
+const { Customer, FinAccount } = model;
 const { Op } = Sequelize;
 /**
 
@@ -11,9 +11,20 @@ const { Op } = Sequelize;
  */
 class CustomerRepo {
   /**
-   * Method to create/record transaction on a fincare account
-   * @param {object} id with Request Object
+   * Method to get all customers
+   * @return {object} JSON response
+   */
+  static getAll() {
+    return Customer.findAll({
+      include: [{ model: FinAccount, as: 'FinAccounts' }],
+    }).catch((error) => {
+      throw new Error(error);
+    });
+  }
 
+  /**
+   * Method to get a customer given the customer id
+   * @param {string} id
    * @return {object} JSON response
    */
   static getById(id) {
@@ -21,6 +32,7 @@ class CustomerRepo {
       where: {
         [Op.or]: [{ id }],
       },
+      include: [{ model: FinAccount, as: 'FinAccounts' }],
     }).catch((error) => {
       throw new Error(error);
     });
