@@ -1,8 +1,11 @@
 import Sequelize from 'sequelize';
 
 import model from '../models';
+import RepaymentRepo from './RepaymentsRepo';
 
-const { Loan, LoanGaurantor, LoanType } = model;
+const {
+  Loan, LoanGaurantor, LoanType, sequelize,
+} = model;
 const { Op } = Sequelize;
 /**
 
@@ -60,6 +63,54 @@ class LoanRepo {
         include: [{ model: LoanGaurantor, as: 'Gaurantors' }],
       },
     );
+  }
+
+  /**
+   * Method to approve a loan
+   * @param {object} loan
+   * @param {number} approvedAmount
+   * @return {object} repamentData
+   */
+  static async approveLoan(loan, approvedAmount) {
+    const {
+      duration,
+      LoanType: { interestRate, payCycle },
+    } = loan;
+
+    const durationCount = duration[0];
+    const payCycleCount = payCycle === 'Monthly' ? 1 : 4;
+    const numberOfPayments = Number(durationCount) * Number(payCycleCount);
+
+    const interest = approvedAmount * durationCount * (interestRate / 100);
+    const totalPaybackAmount = Number(approvedAmount) + Number(interest);
+
+    let transaction;
+    try {
+      transaction = await sequelize.transaction();
+
+      const approvedLoan = await loan.update(
+        { approvedAmount, approvalStatus: 'approved' },
+        { transaction },
+      );
+
+      const repayments = await RepaymentRepo.createRepayments(
+        approvedLoan,
+        transaction,
+        totalPaybackAmount,
+        numberOfPayments,
+      );
+
+      await transaction.commit();
+      return {
+        approvedLoan,
+        repayments,
+        totalPaybackAmount,
+        numberOfPayments,
+      };
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   /**

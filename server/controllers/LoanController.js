@@ -1,16 +1,8 @@
-import { range } from 'lodash';
-import moment from 'moment';
-
-import model from '../models';
 import response from '../helpers/responses';
 import FinAccountRepo from '../repository/FinAccountRepo';
 import LoanTypeRepo from '../repository/LoanTypeRepo';
 import CustomerRepo from '../repository/CustomerRepo';
 import LoanRepo from '../repository/LoanRepo';
-import createLoanRepayments from '../utils/createLoanRepayments';
-
-const { Repayment, sequelize } = model;
-
 /**
  * Controller to handle neccessary loan requests
  */
@@ -164,7 +156,7 @@ class LoanController {
         });
       }
 
-      const { repayments, totalPaybackAmount, numberOfPayments } = await createLoanRepayments(
+      const { repayments, totalPaybackAmount, numberOfPayments } = await LoanRepo.approveLoan(
         loan,
         approvedAmount,
       );
@@ -208,7 +200,6 @@ class LoanController {
           message: 'There is no customer with such an id',
         });
       }
-
       if (['approved', 'rejected'].includes(loan.approvalStatus)) {
         return response.badRequest(res, {
           message: `Unable to complete this loan rejection request as it has already been ${
