@@ -183,6 +183,48 @@ class LoanController {
       return response.internalError(res, { error });
     }
   }
+
+  /**
+   * Method to approve a loan request
+   * @param {object} req with Request Object
+   * @param {object} res Response Object
+   * @return {object} JSON response
+   */
+  static async rejectLoan(req, res) {
+    const { customerId, loanRefNo } = req.params;
+    const findLoan = () => LoanRepo.getByLoanRefNo(loanRefNo);
+    const findCustomer = () => CustomerRepo.getById(customerId);
+
+    try {
+      const [loan, customer] = await Promise.all([findLoan(), findCustomer()]);
+
+      if (!loan) {
+        return response.notFound(res, {
+          message: 'There is no loan with such a loanRefNo',
+        });
+      }
+      if (!customer) {
+        return response.notFound(res, {
+          message: 'There is no customer with such an id',
+        });
+      }
+
+      if (['approved', 'rejected'].includes(loan.approvalStatus)) {
+        return response.badRequest(res, {
+          message: `Unable to complete this loan rejection request as it has already been ${
+            loan.approvalStatus
+          }`,
+        });
+      }
+
+      const rejecetedLoan = await LoanRepo.rejectLoan(loan);
+      const message = 'Loan has been rejected successfully';
+
+      return response.success(res, { message, loanRefNo, rejecetedLoan });
+    } catch (error) {
+      return response.internalError(res, { error });
+    }
+  }
 }
 
 export default LoanController;

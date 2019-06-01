@@ -61,6 +61,17 @@ class LoanRepo {
       },
     );
   }
+
+  /**
+   * Method to reject a loan given the loan instance
+   * @param {object} loan instance
+   * @return {object} loan
+   */
+  static rejectLoan(loan) {
+    return loan.update({ approvalStatus: 'rejected' }, { returning: true }).catch((error) => {
+      throw new Error(error);
+    });
+  }
 }
 
 export default LoanRepo;
