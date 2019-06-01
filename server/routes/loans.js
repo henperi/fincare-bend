@@ -39,4 +39,14 @@ loanRouter.post(
   LoanController.approveLoan,
 );
 
+/**
+ * Reject a loan
+ */
+loanRouter.post(
+  '/reject/:customerId/:loanRefNo',
+  checkAuth,
+  checkAccessLevel.isAdmin,
+  LoanController.rejectLoan,
+);
+
 export default loanRouter;
