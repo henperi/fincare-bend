@@ -13,13 +13,22 @@ class CustomerController {
    */
   static async fetchAllCustomers(req, res) {
     const { applyPagination, paginationData } = res.locals;
+
     try {
-      const { count, rows: allCustomers } = await CustomerRepo.getAll(applyPagination);
+      const { count, rows: allCustomers, cache } = await CustomerRepo.getAll(
+        applyPagination,
+        req.originalUrl,
+      );
 
       const message = 'Array of 0 or more customers has been fetched successfully';
       const metaData = { count, ...paginationData };
 
-      return response.success(res, { message, allCustomers, metaData });
+      return response.success(res, {
+        message,
+        allCustomers,
+        metaData,
+        cache,
+      });
     } catch (error) {
       return response.internalError(res, { error });
     }

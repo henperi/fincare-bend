@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 
 import model from '../models';
+import myStore from '../db/myStore';
 
 const { Customer, FinAccount } = model;
 const { Op } = Sequelize;
@@ -13,16 +14,24 @@ class CustomerRepo {
   /**
    * Method to get all customers
    * @param {func} applyPagination
+   * @param {string} key
    * @return {object} JSON response
    */
-  static getAll(applyPagination) {
-    return Customer.findAndCountAll({
+  static async getAll(applyPagination, key) {
+    if (myStore.get(key)) {
+      return { ...myStore.get(key), cache: true };
+    }
+
+    const customer = Customer.findAndCountAll({
       ...applyPagination(),
       where: { isDeleted: false },
       include: [{ model: FinAccount, as: 'FinAccounts' }],
     }).catch((error) => {
       throw new Error(error);
     });
+
+    myStore.save(key, customer);
+    return customer;
   }
 
   /**
