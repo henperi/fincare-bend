@@ -105,12 +105,14 @@ class FinAccountController {
    * @return {object} JSON response
    */
   static async fetchAllFinAccounts(req, res) {
+    const { applyPagination, paginationData } = res.locals;
     try {
-      const allFinAccounts = await FinAccountRepo.getAll();
+      const { count, rows: allFinAccounts } = await FinAccountRepo.getAll(applyPagination);
 
       const message = 'Array of 0 or more finAccounts has been fetched successfully';
+      const metaData = { count, ...paginationData };
 
-      return response.success(res, { message, allFinAccounts });
+      return response.success(res, { message, allFinAccounts, metaData });
     } catch (error) {
       return response.internalError(res, { error });
     }

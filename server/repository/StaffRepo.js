@@ -14,10 +14,12 @@ const { Op } = Sequelize;
 class StaffRepo {
   /**
    * Method to get all staffs excluding SuperAdmin
+   * @param {func} applyPagination
    * @return {object} JSON response
    */
-  static getAll() {
-    return Staff.findAll({
+  static getAll(applyPagination) {
+    return Staff.findAndCountAll({
+      ...applyPagination(),
       where: {
         level: {
           [Op.ne]: 'SuperAdmin',
