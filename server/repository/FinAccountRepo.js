@@ -12,10 +12,12 @@ const { Op } = Sequelize;
 class FinAccountRepo {
   /**
    * Method to get all finAccounts
+   * @param {func} applyPagination
    * @return {array} Array of loans
    */
-  static getAll() {
-    return FinAccount.findAll({
+  static getAll(applyPagination) {
+    return FinAccount.findAndCountAll({
+      ...applyPagination(),
       include: [{ model: AccountType, as: 'AccountType' }, { model: Customer, as: 'Customer' }],
     }).catch((error) => {
       throw new Error(error);

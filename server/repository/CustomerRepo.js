@@ -12,10 +12,13 @@ const { Op } = Sequelize;
 class CustomerRepo {
   /**
    * Method to get all customers
+   * @param {func} applyPagination
    * @return {object} JSON response
    */
-  static getAll() {
-    return Customer.findAll({
+  static getAll(applyPagination) {
+    return Customer.findAndCountAll({
+      ...applyPagination(),
+      where: { isDeleted: false },
       include: [{ model: FinAccount, as: 'FinAccounts' }],
     }).catch((error) => {
       throw new Error(error);

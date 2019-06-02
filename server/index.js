@@ -8,6 +8,7 @@ import cors from 'cors';
 import formatErrors from './helpers/formatErrors';
 import router from './routes';
 import response from './helpers/responses';
+import applyPagination from './helpers/applyPagination';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan('dev'));
 app.use(expressValidator(formatErrors()));
 app.use(limiter);
+app.use(applyPagination);
 
 app.use('/api/v1', router);
 app.use('/*', (req, res) => response.notFound(res, { message: 'This endpoint does not exist' }));

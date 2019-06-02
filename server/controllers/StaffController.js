@@ -21,12 +21,14 @@ class StaffController {
    * @return {object} JSON response
    */
   static async fetchAllStaffs(req, res) {
+    const { applyPagination, paginationData } = res.locals;
     try {
-      const allStaff = await StaffRepo.getAll();
+      const { count, rows: allStaff } = await StaffRepo.getAll(applyPagination);
 
       const message = 'Array of 0 or more staffs has been fetched successfully';
+      const metaData = { count, ...paginationData };
 
-      return response.success(res, { message, allStaff });
+      return response.success(res, { message, allStaff, metaData });
     } catch (error) {
       return response.internalError(res, { error });
     }
@@ -283,8 +285,10 @@ class StaffController {
    * @return {object} JSON response
    */
   static async fetchAllCustomers(req, res) {
+    const { applyPagination, paginationData } = res.locals;
     try {
-      const customers = await Customer.findAll({
+      const { count, rows: customers } = await Customer.findAndCountAll({
+        ...applyPagination(),
         where: { isDeleted: false },
         include: [
           { model: Address, as: 'Address' },
@@ -294,8 +298,9 @@ class StaffController {
       });
 
       const message = 'Array of 0 or more customers fetched successfully';
+      const metaData = { count, ...paginationData };
 
-      return response.created(res, { message, customers });
+      return response.created(res, { message, customers, metaData });
     } catch (error) {
       return response.internalError(res, { error });
     }
