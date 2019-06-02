@@ -3,24 +3,10 @@ import response from './responses';
 const applyPagination = (req, res, next) => {
   const { page: pageQuery = 0, pageSize: pageSizeQuery = 5 } = req.query;
 
-  const page = parseInt(pageQuery, 10);
-  const pageSize = parseInt(pageSizeQuery, 10);
+  const page = Math.abs(parseInt(pageQuery, 10));
+  const pageSize = Math.abs(parseInt(pageSizeQuery, 10));
 
-  if (pageQuery && pageSizeQuery) {
-    if (!page || page < 0) {
-      return response.badRequest(res, {
-        issue: 'queryParram',
-        message: 'page must be a valid number greater than 0',
-      });
-    }
-
-    if (!pageSize || pageSize < 0) {
-      return response.badRequest(res, {
-        issue: 'queryParram',
-        message: 'if pageSize is provided it must be a number greater than 0',
-      });
-    }
-
+  if (page && pageSize) {
     if (pageSize > 25) {
       return response.badRequest(res, {
         issue: 'queryParram',
@@ -28,8 +14,8 @@ const applyPagination = (req, res, next) => {
       });
     }
 
-    const offset = Math.abs(pageSize * (page > 0 ? page - 1 : page));
-    const limit = Math.abs(offset + pageSize);
+    const offset = pageSize * (page > 0 ? page - 1 : page);
+    const limit = offset + pageSize;
 
     res.locals.applyPagination = () => ({
       offset,
@@ -48,6 +34,7 @@ const applyPagination = (req, res, next) => {
     offset: 0,
     limit: 5,
   });
+
   res.locals.paginationData = {
     page: 1,
     pageSize: 5,
