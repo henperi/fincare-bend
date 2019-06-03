@@ -107,12 +107,20 @@ class FinAccountController {
   static async fetchAllFinAccounts(req, res) {
     const { applyPagination, paginationData } = res.locals;
     try {
-      const { count, rows: allFinAccounts } = await FinAccountRepo.getAll(applyPagination);
+      const { count, rows: allFinAccounts, cache } = await FinAccountRepo.getAll(
+        applyPagination,
+        req.originalUrl,
+      );
 
       const message = 'Array of 0 or more finAccounts has been fetched successfully';
       const metaData = { count, ...paginationData };
 
-      return response.success(res, { message, allFinAccounts, metaData });
+      return response.success(res, {
+        message,
+        allFinAccounts,
+        metaData,
+        cache,
+      });
     } catch (error) {
       return response.internalError(res, { error });
     }
@@ -127,7 +135,7 @@ class FinAccountController {
   static async fetchByAccountNumber(req, res) {
     const { accountNumber } = req.params;
     try {
-      const finAccount = await FinAccountRepo.getByAccountNumber(accountNumber);
+      const finAccount = await FinAccountRepo.getByAccountNumber(accountNumber, req.originalUrl);
 
       if (!finAccount) {
         return response.notFound(res, {

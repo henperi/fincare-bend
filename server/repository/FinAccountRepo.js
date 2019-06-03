@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 
 import model from '../models';
+import myStore from '../db/myStore';
 
 const { FinAccount, AccountType, Customer } = model;
 const { Op } = Sequelize;
@@ -13,24 +14,41 @@ class FinAccountRepo {
   /**
    * Method to get all finAccounts
    * @param {func} applyPagination
+   * @param {string} key
    * @return {array} Array of loans
    */
-  static getAll(applyPagination) {
-    return FinAccount.findAndCountAll({
+  static async getAll(applyPagination, key) {
+    const cachedData = await myStore.get(key);
+
+    if (cachedData) {
+      return { ...cachedData, cache: true };
+    }
+
+    const finAccounts = FinAccount.findAndCountAll({
       ...applyPagination(),
       include: [{ model: AccountType, as: 'AccountType' }, { model: Customer, as: 'Customer' }],
     }).catch((error) => {
       throw new Error(error);
     });
+
+    myStore.save(key, finAccounts);
+    return finAccounts;
   }
 
   /**
    * Method to get a fincare account by the accountNumber
-   * @param {object} accountNumber with Request Object
+   * @param {string} accountNumber
+   * @param {string} key
    * @return {object} FinAccount
    */
-  static getByAccountNumber(accountNumber) {
-    return FinAccount.findOne({
+  static async getByAccountNumber(accountNumber, key) {
+    const cachedData = await myStore.get(key);
+
+    if (cachedData) {
+      return { ...cachedData, cache: true };
+    }
+
+    const finAccount = FinAccount.findOne({
       where: {
         [Op.or]: [{ accountNumber }],
       },
@@ -38,15 +56,25 @@ class FinAccountRepo {
     }).catch((error) => {
       throw new Error(error);
     });
+
+    myStore.save(key, finAccount);
+    return finAccount;
   }
 
   /**
    * Method to get a fincare account by the accountNumber
-   * @param {object} customerId with Request Object
+   * @param {string} customerId
+   * @param {string} key
    * @return {object} FinAccount
    */
-  static getByCustomerId(customerId) {
-    return FinAccount.findAll({
+  static async getByCustomerId(customerId, key) {
+    const cachedData = await myStore.get(key);
+
+    if (cachedData) {
+      return { ...cachedData, cache: true };
+    }
+
+    const finAccount = FinAccount.findAll({
       where: {
         [Op.or]: [{ customerId }],
       },
@@ -54,14 +82,19 @@ class FinAccountRepo {
     }).catch((error) => {
       throw new Error(error);
     });
+
+    myStore.save(key, finAccount);
+    return finAccount;
   }
 
   /**
    * Method to delete all fincare accounts by the customer
-   * @param {object} customerId with Request Object
+   * @param {string} customerId
+   * @param {string} key
    * @return {object} FinAccount
    */
-  static deleteByCustomerId(customerId) {
+  static deleteByCustomerId(customerId, key) {
+    myStore.remove(key);
     return FinAccount.update(
       { isDeleted: true },
       {
