@@ -3,8 +3,9 @@ import Sequelize from 'sequelize';
 import model from '../models';
 import response from '../helpers/responses';
 import FinAccountRepo from '../repository/FinAccountRepo';
+import CustomerRepo from '../repository/CustomerRepo';
 
-const { Customer, FinAccount, AccountType } = model;
+const { FinAccount, AccountType } = model;
 const { Op } = Sequelize;
 /**
  * Controller to handle neccessary staffActions
@@ -31,13 +32,7 @@ class FinAccountController {
         throw new Error(error);
       });
 
-      const findCustomer = () => Customer.findOne({
-        where: {
-          [Op.or]: [{ id: customerId }],
-        },
-      }).catch((error) => {
-        throw new Error(error);
-      });
+      const findCustomer = () => CustomerRepo.getById(customerId);
 
       const getMaxAccountNumber = () => FinAccount.max('accountNumber').catch((error) => {
         throw new Error(error);
@@ -68,6 +63,13 @@ class FinAccountController {
         return response.notFound(res, {
           message:
             "The customer you're attempting to add a fincare financial account for does not exist",
+        });
+      }
+
+      if (customer.isDeleted) {
+        return response.notFound(res, {
+          message:
+            "The customer you're attempting to add a fincare financial account for has been deleted",
         });
       }
 
@@ -135,7 +137,7 @@ class FinAccountController {
   static async fetchByAccountNumber(req, res) {
     const { accountNumber } = req.params;
     try {
-      const finAccount = await FinAccountRepo.getByAccountNumber(accountNumber, req.originalUrl);
+      const finAccount = await FinAccountRepo.getByAccountNumber(accountNumber);
 
       if (!finAccount) {
         return response.notFound(res, {

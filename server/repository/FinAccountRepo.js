@@ -41,8 +41,8 @@ class FinAccountRepo {
    * @param {string} key
    * @return {object} FinAccount
    */
-  static async getByAccountNumber(accountNumber, key) {
-    const cachedData = await myStore.get(key);
+  static async getByAccountNumber(accountNumber, key = '') {
+    const cachedData = key && (await myStore.get(key));
 
     if (cachedData) {
       return { ...cachedData, cache: true };
@@ -67,8 +67,8 @@ class FinAccountRepo {
    * @param {string} key
    * @return {object} FinAccount
    */
-  static async getByCustomerId(customerId, key) {
-    const cachedData = await myStore.get(key);
+  static async getByCustomerId(customerId, key = '') {
+    const cachedData = key && (await myStore.get(key));
 
     if (cachedData) {
       return { ...cachedData, cache: true };
@@ -90,11 +90,9 @@ class FinAccountRepo {
   /**
    * Method to delete all fincare accounts by the customer
    * @param {string} customerId
-   * @param {string} key
    * @return {object} FinAccount
    */
-  static deleteByCustomerId(customerId, key) {
-    myStore.remove(key);
+  static deleteByCustomerId(customerId) {
     return FinAccount.update(
       { isDeleted: true },
       {

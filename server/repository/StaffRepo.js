@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 
 import model from '../models';
+import myStore from '../db/myStore';
 
 const {
   Staff, StaffProfile, Customer, Loan,
@@ -15,10 +16,16 @@ class StaffRepo {
   /**
    * Method to get all staffs excluding SuperAdmin
    * @param {func} applyPagination
+   * @param {string} key
    * @return {object} JSON response
    */
-  static getAll(applyPagination) {
-    return Staff.findAndCountAll({
+  static async getAll(applyPagination, key = '') {
+    const cachedData = key && (await myStore.get(key));
+    if (cachedData) {
+      return { ...cachedData, cache: true };
+    }
+
+    const staffs = Staff.findAndCountAll({
       ...applyPagination(),
       where: {
         level: {
@@ -30,6 +37,9 @@ class StaffRepo {
     }).catch((error) => {
       throw new Error(error);
     });
+
+    myStore.save(key, staffs);
+    return staffs;
   }
 
   /**

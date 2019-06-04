@@ -38,12 +38,12 @@ class CustomerRepo {
 
   /**
    * Method to get a customer given the customer id
-   * @param {string} id
-   * @param {string} key
+   * @param {string} id customerId
+   * @param {string} key? key to search for
    * @return {object} JSON response
    */
-  static async getById(id, key) {
-    const cachedData = await myStore.get(key);
+  static async getById(id, key = '') {
+    const cachedData = key && (await myStore.get(key));
 
     if (cachedData) {
       return { ...cachedData, cache: true };

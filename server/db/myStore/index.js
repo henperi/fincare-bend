@@ -11,18 +11,19 @@ const myStore = {
    * @param {number} time(minutes): default 30mins
    * @return {void} void
    */
-  save: async (key, value, time) => {
+  save: async (key, value, time = 30) => {
     store[key] = JSON.stringify(await value);
-    // console.log('\n RAW KEY \n', store[key]);
+
+    const timeInMinutes = time * 60; // force the time sent above to minutes
 
     if (key && store[key]) {
-      redisClient.set(key, store[key], (error) => {
+      redisClient.set(key, store[key], 'EX', timeInMinutes, (error) => {
         if (error) {
           console.log(`REDIS ERORR::: setting======>${key}`, error);
         }
       });
     }
-    return myStore.expireIn(key, time);
+    return myStore.expireIn(key, timeInMinutes);
   },
 
   /**
@@ -70,19 +71,19 @@ const myStore = {
   },
 
   /**
-   * @description reset an item from the store by its key given a timeline
+   * @description Given a key, remove an item from the store at a given timeline
    *
    * @param {any} key
    * @param {integer} time
    * @return {void}
    */
   expireIn: (key, time = 30) => {
-    redisClient.expire(key, time * 60);
+    // redisClient.expire(key, time * 60);
 
     setTimeout(() => {
       // Remove it from the local store in 1/3 the time it stays in redis
-      store[key] = undefined;
-    }, (time / 3) * 60 * 1000);
+      delete store[key];
+    }, (time / 3) * 1000);
   },
 };
 

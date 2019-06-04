@@ -43,7 +43,7 @@ class CustomerController {
   static async fetchById(req, res) {
     const { customerId } = req.params;
     try {
-      const customer = await CustomerRepo.getById(customerId, req.originalUrl);
+      const customer = await CustomerRepo.getById(customerId);
 
       if (!customer) {
         return response.notFound(res, {

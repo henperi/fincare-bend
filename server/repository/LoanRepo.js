@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 
 import model from '../models';
 import RepaymentRepo from './RepaymentsRepo';
+import myStore from '../db/myStore';
 
 const {
   Loan, LoanGaurantor, LoanType, Customer, sequelize,
@@ -16,23 +17,32 @@ class LoanRepo {
   /**
    * Method to get all loans
    * @param {func} applyPagination
+   * @param {string} key
    * @return {array} Array of loans
    */
-  static getAll(applyPagination) {
-    return Loan.findAndCountAll({
+  static async getAll(applyPagination, key = '') {
+    const cachedData = key && (await myStore.get(key));
+    if (cachedData) {
+      return { ...cachedData, cache: true };
+    }
+
+    const loans = Loan.findAndCountAll({
       ...applyPagination(),
       include: [{ model: LoanType, as: 'LoanType' }, { model: Customer, as: 'Customer' }],
     }).catch((error) => {
       throw new Error(error);
     });
+
+    myStore.save(key, loans);
+    return loans;
   }
 
   /**
    * Method to get a loan by the id
-   * @param {string} id with Request Object
+   * @param {string} id
    * @return {object} LoanType
    */
-  static getById(id) {
+  static async getById(id) {
     return Loan.findOne({
       where: {
         [Op.or]: [{ id }],
@@ -45,10 +55,11 @@ class LoanRepo {
 
   /**
    * Method to get a loan by the loanRefNo
-   * @param {string} loanRefNo with Request Object
+   * @param {string} loanRefNo
+   * @param {string} key
    * @return {object} LoanType
    */
-  static getByLoanRefNo(loanRefNo) {
+  static async getByLoanRefNo(loanRefNo) {
     return Loan.findOne({
       where: {
         [Op.or]: [{ loanRefNo }],
@@ -61,7 +72,7 @@ class LoanRepo {
 
   /**
    * Method to create a loan and include gaurantors
-   * @param {object} loanDetails with Request Object
+   * @param {object} loanDetails
    * @return {object} LoanType
    */
   static createLoan(loanDetails) {
@@ -92,7 +103,9 @@ class LoanRepo {
       {
         include: [{ model: LoanGaurantor, as: 'Gaurantors' }],
       },
-    );
+    ).catch((error) => {
+      throw new Error(error);
+    });
   }
 
   /**
@@ -131,6 +144,7 @@ class LoanRepo {
       );
 
       await transaction.commit();
+
       return {
         approvedLoan,
         repayments,
