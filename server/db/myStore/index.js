@@ -12,18 +12,22 @@ const myStore = {
    * @return {void} void
    */
   save: async (key, value, time = 30) => {
-    store[key] = JSON.stringify(await value);
+    // store the stringified version in redis
+    const stringifiedValue = JSON.stringify(await value);
+    // store the parsed version in the local store
+    store[key] = JSON.parse(stringifiedValue);
 
     const timeInMinutes = time * 60; // force the time sent above to minutes
 
     if (key && store[key]) {
-      redisClient.set(key, store[key], 'EX', timeInMinutes, (error) => {
+      redisClient.set(key, stringifiedValue, 'EX', timeInMinutes, (error) => {
         if (error) {
           console.log(`REDIS ERORR::: setting======>${key}`, error);
         }
       });
     }
-    return myStore.expireIn(key, timeInMinutes);
+    // Remove it from the local store in 1/3 the time it stays in redis
+    return myStore.expireIn(key, timeInMinutes / 3);
   },
 
   /**
@@ -34,10 +38,12 @@ const myStore = {
    */
   get: key => new Promise((resolve) => {
     if (store[key]) {
-      return resolve(JSON.parse(store[key]));
+      // console.log('\n From Store[key] \n');
+      return resolve(store[key]);
     }
     return redisClient.get(key, (error, result) => {
       if (result) {
+        // console.log('\n From Redis \n');
         return resolve(JSON.parse(result));
       }
       console.log(`REDIS ERROR:::GETTING=====>${key}`, error);
@@ -71,7 +77,7 @@ const myStore = {
   },
 
   /**
-   * @description Given a key, remove an item from the store at a given timeline
+   * @description Given a key, remove an item from the store after a given timeline
    *
    * @param {any} key
    * @param {integer} time
@@ -81,9 +87,8 @@ const myStore = {
     // redisClient.expire(key, time * 60);
 
     setTimeout(() => {
-      // Remove it from the local store in 1/3 the time it stays in redis
       delete store[key];
-    }, (time / 3) * 1000);
+    }, time * 1000);
   },
 };
 

@@ -42,7 +42,7 @@ class SuperAdminController {
         {
           email: email.trim(),
           uniqueId: generateStaffId(),
-          secreteKey: `${generateRefNumber(10)}-${email}`,
+          secreteKey: `${generateRefNumber()}-${email}`,
           password: hashedPassword,
           level: staffLevel,
           Profile: {

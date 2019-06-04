@@ -43,7 +43,7 @@ const checkAuth = async (req, res, next) => {
     if (staff.secreteKey !== secreteKey) {
       return response.notFound(res, {
         issue: 'token',
-        message: 'Opps... SecreteKey issues, please logout and login to your account again',
+        message: 'Opps... Secret key mismatch, please logout and login to your account again',
       });
     }
 
