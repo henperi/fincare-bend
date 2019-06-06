@@ -18,13 +18,41 @@ class CustomerRepo {
    * @return {object} JSON response
    */
   static async getAll(applyPagination, key) {
-    if (myStore.get(key)) {
-      return { ...myStore.get(key), cache: true };
+    const cachedData = await myStore.get(key);
+
+    if (cachedData) {
+      return { ...cachedData, cache: true };
     }
 
-    const customer = Customer.findAndCountAll({
+    const customers = Customer.findAndCountAll({
       ...applyPagination(),
       where: { isDeleted: false },
+      include: [{ model: FinAccount, as: 'FinAccounts' }],
+    }).catch((error) => {
+      throw new Error(error);
+    });
+
+    myStore.save(key, customers);
+    return customers;
+  }
+
+  /**
+   * Method to get a customer given the customer id
+   * @param {string} id customerId
+   * @param {string} key? key to search for
+   * @return {object} JSON response
+   */
+  static async getById(id, key = '') {
+    const cachedData = key && (await myStore.get(key));
+
+    if (cachedData) {
+      return { ...cachedData, cache: true };
+    }
+
+    const customer = Customer.findOne({
+      where: {
+        [Op.or]: [{ id }],
+      },
       include: [{ model: FinAccount, as: 'FinAccounts' }],
     }).catch((error) => {
       throw new Error(error);
@@ -35,27 +63,14 @@ class CustomerRepo {
   }
 
   /**
-   * Method to get a customer given the customer id
-   * @param {string} id
-   * @return {object} JSON response
-   */
-  static getById(id) {
-    return Customer.findOne({
-      where: {
-        [Op.or]: [{ id }],
-      },
-      include: [{ model: FinAccount, as: 'FinAccounts' }],
-    }).catch((error) => {
-      throw new Error(error);
-    });
-  }
-
-  /**
    * Method to delete a customer account by the customer id
-   * @param {object} id with Request Object
+   * @param {number} id with Request Object
+   * @param {string} key with Request Object
    * @return {object} FinAccount
    */
-  static deleteById(id) {
+  static deleteById(id, key) {
+    myStore.remove(key);
+
     return Customer.update(
       { isDeleted: true },
       {

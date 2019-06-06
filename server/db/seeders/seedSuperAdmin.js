@@ -42,7 +42,7 @@ const seedSuperAdmin = () => {
       const superAdmin = await Staff.create(
         {
           uniqueId: generateStaffId(),
-          secreteKey: `${generateRefNumber(10)}-${SU_EMAIL}`,
+          secreteKey: `${generateRefNumber()}-${SU_EMAIL}`,
           email: SU_EMAIL,
           password: hashedPassword,
           level: 'SuperAdmin',

@@ -1,5 +1,6 @@
 {
-  "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+  "terminal.integrated.fontFamily": "Hack Nerd Font",
+  "terminal.integrated.shell.osx": "/bin/zsh",
   "editor.tabSize": 2,
   "files.eol": "\n",
   "javascript.format.enable": false,

@@ -3,8 +3,9 @@ import Sequelize from 'sequelize';
 import model from '../models';
 import response from '../helpers/responses';
 import FinAccountRepo from '../repository/FinAccountRepo';
+import CustomerRepo from '../repository/CustomerRepo';
 
-const { Customer, FinAccount, AccountType } = model;
+const { FinAccount, AccountType } = model;
 const { Op } = Sequelize;
 /**
  * Controller to handle neccessary staffActions
@@ -31,13 +32,7 @@ class FinAccountController {
         throw new Error(error);
       });
 
-      const findCustomer = () => Customer.findOne({
-        where: {
-          [Op.or]: [{ id: customerId }],
-        },
-      }).catch((error) => {
-        throw new Error(error);
-      });
+      const findCustomer = () => CustomerRepo.getById(customerId);
 
       const getMaxAccountNumber = () => FinAccount.max('accountNumber').catch((error) => {
         throw new Error(error);
@@ -68,6 +63,13 @@ class FinAccountController {
         return response.notFound(res, {
           message:
             "The customer you're attempting to add a fincare financial account for does not exist",
+        });
+      }
+
+      if (customer.isDeleted) {
+        return response.notFound(res, {
+          message:
+            "The customer you're attempting to add a fincare financial account for has been deleted",
         });
       }
 
@@ -107,12 +109,20 @@ class FinAccountController {
   static async fetchAllFinAccounts(req, res) {
     const { applyPagination, paginationData } = res.locals;
     try {
-      const { count, rows: allFinAccounts } = await FinAccountRepo.getAll(applyPagination);
+      const { count, rows: allFinAccounts, cache } = await FinAccountRepo.getAll(
+        applyPagination,
+        req.originalUrl,
+      );
 
       const message = 'Array of 0 or more finAccounts has been fetched successfully';
       const metaData = { count, ...paginationData };
 
-      return response.success(res, { message, allFinAccounts, metaData });
+      return response.success(res, {
+        message,
+        allFinAccounts,
+        metaData,
+        cache,
+      });
     } catch (error) {
       return response.internalError(res, { error });
     }

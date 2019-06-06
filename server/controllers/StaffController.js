@@ -23,12 +23,17 @@ class StaffController {
   static async fetchAllStaffs(req, res) {
     const { applyPagination, paginationData } = res.locals;
     try {
-      const { count, rows: allStaff } = await StaffRepo.getAll(applyPagination);
+      const { count, rows: allStaff, cache } = await StaffRepo.getAll(
+        applyPagination,
+        req.originalUrl,
+      );
 
       const message = 'Array of 0 or more staffs has been fetched successfully';
       const metaData = { count, ...paginationData };
 
-      return response.success(res, { message, allStaff, metaData });
+      return response.success(res, {
+        message, allStaff, metaData, cache,
+      });
     } catch (error) {
       return response.internalError(res, { error });
     }

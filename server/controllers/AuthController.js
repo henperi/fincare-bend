@@ -4,6 +4,7 @@ import model from '../models';
 import response from '../helpers/responses';
 import { comparePassword, hashPassword } from '../helpers/passwordHelpers';
 import generateAuthToken from '../helpers/generateAuthToken';
+import generateRefNumber from '../helpers/generateRefNo';
 
 const { Staff, StaffProfile } = model;
 const { Op } = Sequelize;
@@ -84,8 +85,10 @@ class AuthController {
       }
 
       const hashedPassword = hashPassword(newPassword.trim());
+
       await staff.update({
         password: hashedPassword || staff.password,
+        secreteKey: `${generateRefNumber()}-${staff.email}`,
       });
       const message = 'Your password has been updated successfully';
 

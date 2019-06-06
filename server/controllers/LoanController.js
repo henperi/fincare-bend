@@ -226,12 +226,20 @@ class LoanController {
   static async fetchAllLoans(req, res) {
     const { applyPagination, paginationData } = res.locals;
     try {
-      const { count, rows: allLoans } = await LoanRepo.getAll(applyPagination);
+      const { count, rows: allLoans, cache } = await LoanRepo.getAll(
+        applyPagination,
+        req.originalUrl,
+      );
 
       const message = 'Array of 0 or more loans has been fetched successfully';
       const metaData = { count, ...paginationData };
 
-      return response.success(res, { message, allLoans, metaData });
+      return response.success(res, {
+        message,
+        allLoans,
+        metaData,
+        cache,
+      });
     } catch (error) {
       return response.internalError(res, { error });
     }
