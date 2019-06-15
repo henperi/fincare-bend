@@ -11,7 +11,13 @@ const expensesRouter = express.Router();
 /**
  * Get all expenses
  */
-expensesRouter.get('/', checkAuth, checkAccessLevel.isAdmin, ExpenseController.fetchAllExpenses);
+expensesRouter.get(
+  '/',
+  checkAuth,
+  checkAccessLevel.isAdmin,
+  expenseMethods.validateFetchAll,
+  ExpenseController.fetchAllExpenses,
+);
 
 /**
  * Create an expense

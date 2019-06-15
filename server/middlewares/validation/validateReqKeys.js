@@ -362,8 +362,8 @@ const validateReqKeys = (req, keys, object = null) => {
       case 'category':
         return req
           .checkBody(param)
-          .isLength({ min: 10 })
-          .withMessage('category must be 10 characters or more')
+          .isLength({ min: 3 })
+          .withMessage('category must be 3 characters or more')
           .isLength({ max: 100 })
           .withMessage('category must not be greater than 100 characters');
 

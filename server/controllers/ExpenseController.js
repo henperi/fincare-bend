@@ -2,7 +2,7 @@ import response from '../helpers/responses';
 import ExpenseRepo from '../repository/ExpenseRepo';
 
 /**
- * Controller to handle neccessary staffActions
+ * Controller to handle neccessary expense actions
  */
 class ExpenseController {
   /**
@@ -12,12 +12,19 @@ class ExpenseController {
    * @return {object} JSON response
    */
   static async fetchAllExpenses(req, res) {
+    const { paginationData } = res.locals;
     try {
-      const expenses = await ExpenseRepo.getAll();
+      const { count, rows: expenses, cache } = await ExpenseRepo.getAll(null, res);
 
       const message = 'Array of 0 or more expenses has been fetched successfully';
+      const metaData = { count, ...paginationData };
 
-      return response.success(res, { message, expenses });
+      return response.success(res, {
+        message,
+        expenses,
+        metaData,
+        cache,
+      });
     } catch (error) {
       return response.internalError(res, { error });
     }
@@ -30,19 +37,8 @@ class ExpenseController {
    * @return {object} JSON response
    */
   static async create(req, res) {
-    const {
-      expenseTitle: title, amount, description, category,
-    } = req.body;
-
     try {
-      // const findExpense = () => ExpenseRepo.getByTitle();
-
-      const newExpense = await ExpenseRepo.create({
-        title,
-        amount,
-        description,
-        category,
-      });
+      const newExpense = await ExpenseRepo.create(req.body);
 
       const message = 'Expense created successfully';
 
