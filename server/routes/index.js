@@ -8,6 +8,7 @@ import loanRouter from './loans';
 import customerRouter from './customers';
 import loanTypeRouter from './loanTypes';
 import accountTypeRouter from './accountTypes';
+import expensesRouter from './expenses';
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use('/loan', loanRouter);
 router.use('/customer', customerRouter);
 router.use('/loan-types', loanTypeRouter);
 router.use('/account-types', accountTypeRouter);
+router.use('/expense', expensesRouter);
 
 export default router;

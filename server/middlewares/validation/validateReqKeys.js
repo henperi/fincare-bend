@@ -359,6 +359,22 @@ const validateReqKeys = (req, keys, object = null) => {
           .isLength({ max: 300 })
           .withMessage('description must not be greater than 300 characters');
 
+      case 'category':
+        return req
+          .checkBody(param)
+          .isLength({ min: 3 })
+          .withMessage('category must be 3 characters or more')
+          .isLength({ max: 100 })
+          .withMessage('category must not be greater than 100 characters');
+
+      case 'expenseTitle':
+        return req
+          .checkBody(param)
+          .isLength({ min: 10 })
+          .withMessage('expenseTitle must be 10 characters or more')
+          .isLength({ max: 100 })
+          .withMessage('expenseTitle must not be greater than 100 characters');
+
       default:
         return null;
     }
